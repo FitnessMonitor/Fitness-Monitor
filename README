@@ -1,3 +1,3 @@
 This is the working branch for Dan Cole.
 
-You can use the submit.ext script by using the command:		sh ./submit.ext 'your_message'
+You can use the submit.ext script by using the command:		sh ./submit.ext your message with spaces
