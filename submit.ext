@@ -1,3 +1,4 @@
+MESSAGE = $1 
 git add *
-git commit -m 'scripted update'
+git commit -m '$MESSAGE'
 git push
