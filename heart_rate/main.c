@@ -14,11 +14,14 @@ uint16_t hr_avg;
 volatile int8_t ADC_running;
 volatile uint8_t ms_count;
 uint8_t i; //generic loop counter
+uint8_t beat_state;
 
 //Macros for setting, clearing and toogleing bits.
 #define SET_BIT(PORT, BITNUM) ((PORT) |= (1<<(BITNUM)))
 #define CLEAR_BIT(PORT, BITNUM) ((PORT) &= ~(1<<(BITNUM)))
 #define TOGGLE_BIT(PORT, BITNUM) ((PORT) ^= (1<<(BITNUM)))
+
+
 
 ISR( PCINT2_vect ) 
 {
@@ -28,6 +31,7 @@ ISR( PCINT2_vect )
 ISR(TIMER2_OVF_vect)	//when timer 2 interrupts
 {			//wake up from sleeping
 	sleep_disable();
+	timer2_1ms_reset();	//reset timer to interrupt in 1ms
 	ms_count++;
 	TOGGLE_BIT(PORTD,0);
 	if (ms_count >= 100)
@@ -53,6 +57,8 @@ ISR(ADC_vect)
 
 int main(void){
 	//initialize ports
+	timer2_1ms_setup();
+	update_time();
 	SET_BIT(DDRD,1);
 	SET_BIT(DDRD,0);
 	CLEAR_BIT(PORTD, 0);	
@@ -77,11 +83,11 @@ int main(void){
 		{
 			SET_BIT(PORTD, 1);
 		}
-		else if (heart_rate_data[current_sample] <= (hr_avg-1))
+		else 
 		{
 			CLEAR_BIT(PORTD,1);
 		}
-		sleep_ms(1);	// sleep for 1 ms
+		sleep_now();	// sleep for 1 ms
 	}
 }
 
