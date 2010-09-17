@@ -15,9 +15,19 @@ extern void timer2_1ms_setup()
 	//set timer value to 247
 	TCNT2 = 247;
 }
-
+/*
+extern void RTC_get_dhms (.......)
+{
+	keep time value in seconds
+}
+extern void RTC_set_dhms (.......)
+{
+}
+*/
 extern void update_time()
 {
+	//this should change to something that stores the number of seconds 
+	//from a given point
 	RTC_milisec++;
 	if (RTC_milisec > 1000)
 	{
