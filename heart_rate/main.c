@@ -58,9 +58,8 @@ int main(void){
 	//initialize ports
 	timer2_1ms_setup();
 	update_time();
-	SET_BIT(DDRD,1);
-	SET_BIT(DDRD,0);
-	CLEAR_BIT(PORTD, 0);	
+	SET_BIT(DDRC,5);
+	
 
 	ADC_init();	//initialize ADC
 	
@@ -124,14 +123,14 @@ int main(void){
 			if (( hr_rlng_avg > hr_avg )&&(beat_high == 0))
 			{
 				beat_high = 1;
-				//SET_BIT(PORTD, 1);
+				SET_BIT(PORTC, 5);
 				hr_interval[interval] = btwn_beat_ctr;	//store the time between beats
 				btwn_beat_ctr = 0; //reset the counter
 			}
 			else if (( hr_rlng_avg < hr_avg ) && (beat_high == 1))
 			{
 				beat_high = 0;
-				//CLEAR_BIT(PORTD,1);
+				CLEAR_BIT(PORTC,5);
 			}
 
 			//calculate average heart rate
