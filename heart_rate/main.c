@@ -10,18 +10,16 @@
 #include "../lcd.c"
 
 volatile uint8_t hr_samples[40];	//ADC sample values	
-volatile uint16_t hr_interval[10];	//time between beats
+volatile uint16_t hr_interval[20];	//time between beats
 volatile uint8_t interval;	//location in array of interval times
 volatile uint8_t sample[3];	//location in array of hr samples
 uint16_t hr_sum;
 uint16_t hr_rlng_avg;
 uint16_t hr_avg;
 uint32_t interval_sum;
-uint16_t avg_interval;
-float hr_period;
-float hr_frequency;
+uint8_t hr_frequency;
 volatile uint8_t beat_high;
-char frequency[2];
+char frequency[3];
 
 volatile int8_t ADC_running;
 volatile uint8_t ms_count;
@@ -97,7 +95,7 @@ int main(void){
 					sample[i] = 0;	
 				}
 			}
-			if (interval >= 10)
+			if (interval >= 20)
 			{
 				interval = 0;
 			}
@@ -134,16 +132,17 @@ int main(void){
 			}
 
 			//calculate average heart rate
-			for (i = 0; i<10; i++)
+			interval_sum = 0;
+			for (i = 0; i<20; i++)
 			{
 				interval_sum = interval_sum + hr_interval[i];
 			}
-			hr_frequency = (600000/interval_sum);
+			hr_frequency = (1200000/interval_sum);
 			
-			ultoa((uint16_t)hr_frequency, frequency, 10 );
+			utoa(hr_frequency, frequency, 10 );
 			lcd_clrscr();
 			lcd_puts("heart_rate:\n");
-			for (i = 0; i<2; i++)
+			for (i = 0; i<3; i++)
 			{
 				lcd_putc(frequency[i]);
 			}
