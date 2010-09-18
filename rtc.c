@@ -1,9 +1,7 @@
 #include "rtc.h"
 
-volatile int8_t RTC_hours;
-volatile int8_t RTC_minutes;
-volatile int8_t RTC_seconds;
-volatile int8_t RTC_milisec;
+volatile uint32_t RTC_counter;
+volatile uint16_t ms_count;
 
 extern void timer2_1ms_setup()
 {
@@ -15,33 +13,36 @@ extern void timer2_1ms_setup()
 	//set timer value to 247
 	TCNT2 = 247;
 }
-/*
-extern void RTC_get_dhms (.......)
+
+extern void RTC_get_dhms (uint32_t RTC_count, uint8_t * days, uint8_t * hours, uint8_t * minutes, uint8_t * seconds)
 {
-	keep time value in seconds
-}
-extern void RTC_set_dhms (.......)
-{
-}
-*/
-extern void update_time()
-{
-	//this should change to something that stores the number of seconds 
-	//from a given point
-	RTC_milisec++;
-	if (RTC_milisec > 1000)
+	days = 0;
+	hours = 0;
+	minutes = 0;
+	seconds = 0;
+
+	while( RTC_count-86400 >= 0)
 	{
-		RTC_milisec = 0;
-		RTC_seconds++;
-		if (RTC_seconds > 60);
-		{
-			RTC_seconds = 0;
-			RTC_hours++;
-			if (RTC_hours > 24)
-			{
-				RTC_hours = 0;
-			}
-		}	
+		RTC_count = RTC_count - 86400;
+		days++;
 	}
+	while( RTC_count-3600 >=0)
+	{
+		RTC_count = RTC_count - 3600;
+		hours++;
+	}
+	while( RTC_count-60 >=0)
+	{
+		RTC_count = RTC_count - 60;
+		minutes++;
+	}
+		*seconds = RTC_count;
+
 }
+
+extern void RTC_set_dhms (uint32_t * RTC_count, uint8_t days, uint8_t hours, uint8_t minutes, uint8_t seconds)
+{
+	*RTC_count = (days*86400) + (hours*3600) + (minutes*60) + seconds;
+}
+
 

@@ -4,5 +4,6 @@
 #define timer2_1ms_reset() TCNT2 = 247
 
 extern void timer2_1ms_setup();
-extern void update_time();
+extern void RTC_get_dhms (uint32_t RTC_count, uint8_t * days, uint8_t * hours, uint8_t * minutes, uint8_t * seconds);
+extern void RTC_set_dhms (uint32_t * RTC_count, uint8_t days, uint8_t hours, uint8_t minutes, uint8_t seconds);
 #endif

@@ -8,23 +8,9 @@
 #include "../sleep.c"
 #include "../ADC.c"
 #include "../lcd.c"
+#include "../heart_rate.c"
 
-volatile uint8_t hr_samples[40];	//ADC sample values	
-volatile uint16_t hr_interval[20];	//time between beats
-volatile uint8_t interval;	//location in array of interval times
-volatile uint8_t sample[3];	//location in array of hr samples
-uint16_t hr_sum;
-uint16_t hr_rlng_avg;
-uint16_t hr_avg;
-uint32_t interval_sum;
-uint8_t hr_frequency;
-volatile uint8_t beat_high;
-char frequency[3];
 
-volatile int8_t ADC_running;
-volatile uint8_t ms_count;
-uint8_t i; //generic loop counter
-volatile uint16_t btwn_beat_ctr;	//stores time between beats
 
 //Macros for setting, clearing and toogleing bits.
 #define SET_BIT(PORT, BITNUM) ((PORT) |= (1<<(BITNUM)))
@@ -42,8 +28,9 @@ ISR(TIMER2_OVF_vect)	//when timer 2 interrupts
 {			//wake up from sleeping
 	sleep_disable();
 	timer2_1ms_reset();	//reset timer to interrupt in 1ms
-	ms_count++;
+	hr_count++;
 	btwn_beat_ctr++;	
+	ms_count++;
 }
 
 ISR(ADC_vect)
@@ -55,7 +42,6 @@ ISR(ADC_vect)
 int main(void){
 	//initialize ports
 	timer2_1ms_setup();
-	update_time();
 	SET_BIT(DDRC,5);
 	
 
@@ -65,27 +51,63 @@ int main(void){
 	sample[1] = 1;
 	sample[2] = 0;
 	
-	ms_count = 0;
+
 	lcd_init(LCD_DISP_ON);
-
 	lcd_clrscr();
+	lcd_puts("test");
 
-	lcd_puts("snow rules");
+	uint8_t days;
+	uint8_t hours;
+	uint8_t minutes;
+	uint8_t seconds;
+	
+	char day_str[2];
+	char hour_str[2];
+	char min_str[2];
+	char sec_str[2];
+
+	RTC_counter = 0;
+
+
 	while(1)
 	{
-		if (ms_count >= 100)
+		if (ms_count >= 1000)
 		{
-			lcd_clrscr();
-			//clear the counter
+			RTC_counter++;
 			ms_count = 0;
+			RTC_get_dhms (RTC_counter, &days, &hours, &minutes, &seconds);
+			
+			utoa( days, day_str, 10 );
+			utoa( hours, hour_str, 10 );
+			utoa( minutes, min_str, 10 );
+			utoa( seconds, sec_str, 10 );
+
+			lcd_clrscr();
+
+			lcd_putc(day_str[0]);
+			lcd_putc(day_str[1]);
+			lcd_puts(":");
+			lcd_putc(hour_str[0]);
+			lcd_putc(hour_str[1]);
+			lcd_puts(":");
+			lcd_putc(min_str[0]);
+			lcd_putc(min_str[1]);
+			lcd_puts(":");
+			lcd_putc(sec_str[0]);
+			lcd_putc(sec_str[1]);
+			
+		}
+
+		if (hr_count >= 100)
+		{
+			//lcd_clrscr();
+			//clear the counter
+			hr_count = 0;
 	
 			//start an ADC
-			ADC_enable();	
-			ADC_interrupt_enable();
-			ADC_running = 1;
-			ADC_start_conversion();
+			ADC_start_single_conversion();
 			
-
+			uint8_t i;
 			//update locations
 			for (i = 0; i<3; i++)
 			{
@@ -140,13 +162,12 @@ int main(void){
 			hr_frequency = (1200000/interval_sum);
 			
 			utoa(hr_frequency, frequency, 10 );
-			lcd_clrscr();
-			lcd_puts("heart_rate:\n");
+			//lcd_clrscr();
+			//lcd_puts("heart_rate:\n");
 			for (i = 0; i<3; i++)
 			{
-				lcd_putc(frequency[i]);
+				//lcd_putc(frequency[i]);
 			}
-
 		}
 
 		//go back to sleep now

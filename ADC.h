@@ -10,5 +10,6 @@
 #define ADC_start_conversion() (ADCSRA |= (1<<ADSC))
 
 extern void ADC_init();
+extern void ADC_start_single_conversion();
 #endif
 
