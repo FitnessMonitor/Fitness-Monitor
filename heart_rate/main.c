@@ -64,6 +64,9 @@ int main(void){
 
 
 	char sec_str[2];
+	char min_str[2];
+	char hr_str[2];
+	char day_str[3];
 	while(1)
 	{
 		if(RTC_ms_counter >= 1000)
@@ -72,7 +75,15 @@ int main(void){
 			RTC_get_dhms (&RTC_sec_counter, &days, &hours, &minutes, &seconds);
 			lcd_puts("m");
 			itoa(seconds, sec_str,10);
+			itoa(minutes, min_str,10);
+			itoa(hours, hr_str,10)
 			lcd_clrscr();
+			lcd_putc(hr_str[0]);
+			lcd_putc(hr_str[1]);
+			lcd_puts(":");
+			lcd_putc(min_str[0]);
+			lcd_putc(min_str[1]);
+			lcd_puts(":");
 			lcd_putc(sec_str[0]);
 			lcd_putc(sec_str[1]);
 			RTC_ms_counter = 0;
