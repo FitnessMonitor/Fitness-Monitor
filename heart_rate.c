@@ -1,24 +1,5 @@
 #include "heart_rate.h"
 
-volatile uint8_t hr_samples[40];	//ADC sample values	
-volatile uint16_t hr_interval[20];	//time between beats
-volatile uint8_t interval;	//location in array of interval times
-volatile uint8_t sample[3];	//location in array of hr samples
-
-uint16_t hr_sum;
-uint16_t hr_avg;
-uint16_t hr_rlng_avg;
-uint32_t interval_sum;
-uint8_t hr_frequency;
-
-volatile uint8_t beat_high;
-char frequency[3];
-
-volatile uint8_t hr_count;
-
-volatile uint16_t btwn_beat_ctr;	//stores time between beats
-
-
 extern uint8_t HR_calculate_avg(uint8_t * value, uint8_t len)
 {
 	uint8_t hr_avg;

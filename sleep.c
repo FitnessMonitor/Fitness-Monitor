@@ -1,5 +1,4 @@
 #include "sleep.h"
-#include "rtc.c"
 
 void sleep_init()
 {

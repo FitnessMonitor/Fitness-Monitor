@@ -1,6 +1,4 @@
 #include "ADC.h"
-volatile int8_t ADC_running;
-
 
 extern void ADC_init()	//initialize ADC
 {
@@ -17,7 +15,7 @@ extern void ADC_start_single_conversion()
 	//start an ADC
 	ADC_enable();	
 	ADC_interrupt_enable();
-	ADC_running = 1;
+	//ADC_running = 1;
 	ADC_start_conversion();
 }
 

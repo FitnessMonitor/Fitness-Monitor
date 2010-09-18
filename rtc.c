@@ -1,8 +1,5 @@
 #include "rtc.h"
 
-volatile uint32_t RTC_counter;
-volatile uint16_t ms_count;
-
 extern void timer2_1ms_setup()
 {
 	// set up timer 2 in normal mode with interrupt on overflow
@@ -10,33 +7,30 @@ extern void timer2_1ms_setup()
 	TCCR2B  |= _BV(CS22);	// prescaler of 64
 	TIMSK2 	|= _BV(TOIE2); 	//enable timer 2 overflow interrupt
 
-	//set timer value to 247
-	TCNT2 = 130;
+	timer2_1ms_reset();
 }
 
-extern void RTC_get_dhms (uint32_t RTC_count, uint8_t * days, uint8_t * hours, uint8_t * minutes, uint8_t * seconds)
+extern void RTC_get_dhms (volatile uint32_t * RTC_count, int16_t * days, int8_t * hours, int8_t * minutes, int8_t * seconds)
 {
-	days = 0;
-	hours = 0;
-	minutes = 0;
-	seconds = 0;
+	int32_t d = 0;
+	int32_t h = 0;
+	int32_t m = 0;
+	int32_t s = 0;
+	uint32_t count;
+	count = *RTC_count;
+		
+	d = count/86400;
+	count = count - (*days*86400);
+	h = count/3600;
+	count = count - (*hours*3600);
+	m = count/60;
+	count = count - (*minutes*60);
+	s = count;
 
-	while( RTC_count-86400 >= 0)
-	{
-		RTC_count = RTC_count - 86400;
-		days++;
-	}
-	while( RTC_count-3600 >=0)
-	{
-		RTC_count = RTC_count - 3600;
-		hours++;
-	}
-	while( RTC_count-60 >=0)
-	{
-		RTC_count = RTC_count - 60;
-		minutes++;
-	}
-		*seconds = RTC_count;
+	*days = d;
+	*hours = h;
+	*minutes = m;
+	*seconds = s;
 
 }
 
@@ -44,5 +38,6 @@ extern void RTC_set_dhms (uint32_t * RTC_count, uint8_t days, uint8_t hours, uin
 {
 	*RTC_count = (days*86400) + (hours*3600) + (minutes*60) + seconds;
 }
+
 
 
