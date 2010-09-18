@@ -9,7 +9,7 @@
 #include "../ADC.c"
 #include "../lcd.c"
 #include "../heart_rate.c"
-#include "../rtc.c"
+
 
 
 
@@ -42,25 +42,24 @@ ISR(ADC_vect)
 
 int main(void){
 	//initialize ports
-	timer2_1ms_setup();
 	SET_BIT(DDRC,5);
 	
-
-	ADC_init();	//initialize ADC
+	//initialize ADC
+	ADC_init();
 	
 	sample[0] = 2;	// these are the starting locations in the array of hr_samples
 	sample[1] = 1;
 	sample[2] = 0;
 	
-
+	//initialize LCD screen
 	lcd_init(LCD_DISP_ON);
 	lcd_clrscr();
 	lcd_puts("test");
 
-	uint8_t days;
-	uint8_t hours;
-	uint8_t minutes;
-	uint8_t seconds;
+	uint8_t  days = 0;
+	uint8_t  hours = 0;
+	uint8_t  minutes = 0;
+	uint8_t  seconds = 0;
 	
 	char day_str[2];
 	char hour_str[2];
@@ -69,7 +68,7 @@ int main(void){
 
 	RTC_counter = 0;
 
-
+	timer2_1ms_setup();
 	while(1)
 	{
 		if (ms_count >= 1000)
@@ -104,10 +103,6 @@ int main(void){
 			//lcd_clrscr();
 			//clear the counter
 			hr_count = 0;
-	
-			//start an ADC
-			ADC_start_single_conversion();
-			
 			uint8_t i;
 			//update locations
 			for (i = 0; i<3; i++)
@@ -122,6 +117,10 @@ int main(void){
 			{
 				interval = 0;
 			}
+	
+			//start an ADC
+			ADC_start_single_conversion();
+			
 
 			//wait for ADC to finish conversion
 			while (ADC_running == 1)
@@ -130,12 +129,7 @@ int main(void){
 			}
 			
 			//calculate the hr_average
-			hr_sum = 0;		//clear the sum
-			for (i=0; i<40; i++)
-			{
-				hr_sum = hr_sum + hr_samples[i];
-			}
-			hr_avg = hr_sum / 40;
+			hr_avg = HR_calculate_avg ( &hr_samples, (sizeof(hr_samples)/sizeof*hr_samples[0]))
 			
 			//calculate the rolling average value
 			hr_rlng_avg = (hr_samples[sample[0]]+hr_samples[sample[1]]+hr_samples[sample[2]])/3;

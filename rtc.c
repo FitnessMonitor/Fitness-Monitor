@@ -7,11 +7,11 @@ extern void timer2_1ms_setup()
 {
 	// set up timer 2 in normal mode with interrupt on overflow
 	TCCR2A = 0x00; 
-	TCCR2B  |= _BV(CS22) | _BV(CS21) | _BV(CS20);	// prescaler of 1024
+	TCCR2B  |= _BV(CS22);	// prescaler of 64
 	TIMSK2 	|= _BV(TOIE2); 	//enable timer 2 overflow interrupt
 
 	//set timer value to 247
-	TCNT2 = 247;
+	TCNT2 = 130;
 }
 
 extern void RTC_get_dhms (uint32_t RTC_count, uint8_t * days, uint8_t * hours, uint8_t * minutes, uint8_t * seconds)

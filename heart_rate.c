@@ -19,7 +19,7 @@ volatile uint8_t hr_count;
 volatile uint16_t btwn_beat_ctr;	//stores time between beats
 
 
-extern uint8_t HR_calculate_avg(uint8_t * value, uint8_t * len)
+extern uint8_t HR_calculate_avg(uint8_t * value, uint8_t len)
 {
 	uint8_t hr_avg;
 	uint16_t hr_sum = 0;		//clear the sum
