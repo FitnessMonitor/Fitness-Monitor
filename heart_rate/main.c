@@ -9,6 +9,7 @@
 #include "../ADC.c"
 #include "../lcd.c"
 #include "../heart_rate.c"
+#include "../rtc.c"
 
 
 
