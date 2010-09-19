@@ -9,19 +9,23 @@
 #include "../ADC.c"
 #include "../lcd.c"
 #include "../rtc.c"
-#include "../heart_rate.c"
+//#include "../heart_rate.c"
 
 //Macros for setting, clearing and toogleing bits.
 #define SET_BIT(PORT, BITNUM) ((PORT) |= (1<<(BITNUM)))
 #define CLEAR_BIT(PORT, BITNUM) ((PORT) &= ~(1<<(BITNUM)))
 #define TOGGLE_BIT(PORT, BITNUM) ((PORT) ^= (1<<(BITNUM)))
 
+#define t_hr_samples 40
+#define beats_to_avg 10
+
 volatile uint32_t RTC_sec_counter;
 volatile uint16_t RTC_ms_counter;
-//volatile uint8_t hr_counter;
 
-//volatile uint8_t hr_samples[50];
-//volatile uint8_t sample[3] = {0, 1, 2};
+volatile uint8_t hr_samples[50];
+volatile uint8_t sample[3] = {0, 1, 2};
+volatile uint8_t hr_counter;
+volatile uint16_t btwn_bt_ctr;
 
 ISR( PCINT2_vect ) 
 {
@@ -33,13 +37,14 @@ ISR(TIMER2_OVF_vect)	//when timer 2 interrupts
 	sleep_disable();
 	timer2_1ms_reset();	//reset timer to interrupt in 1ms
 	RTC_ms_counter++;
-	//hr_counter++;
+	hr_counter++;
+	btwn_bt_ctr++;
 	
 }
 
 ISR(ADC_vect)
 {
-	//hr_samples[sample[0]] = ADCH;
+	hr_samples[sample[0]] = ADCH;
 }
 
 int main(void){
@@ -71,9 +76,15 @@ int main(void){
 	char day_str[3];
 	RTC_set_dhms (&RTC_sec_counter, days, hours, minutes, seconds);
 
-	//uint8_t avg_hr = 0;
+	uint16_t hr_sum = 0;
+	uint8_t avg_hr = 0;
+	uint8_t hr_rlng_avg;
+	uint8_t beat_started = 0;
+	uint16_t btwn_beats[50];
+	uint32_t time_sum = 0;
+	uint16_t avg_beat_time;
 
-	//uint8_t i;
+	uint8_t i;
 
 
 	while(1)
@@ -101,9 +112,10 @@ int main(void){
 			lcd_putc(sec_str[1]);
 			RTC_ms_counter = 0;
 		}
-/*
+
 		if(hr_counter >=100)
 		{
+			hr_counter = 0;
 			hr_samples[sample[0]] = 0;
 
 			ADC_start_single_conversion();
@@ -113,8 +125,34 @@ int main(void){
 				//do nothing
 			}
 			
-			// avg_hr = HR_calculate_avg( &hr_samples[0], t_hr_samples);
+			for (i=0; i<t_hr_samples; i++)
+			{
+				hr_sum = hr_sum + hr_samples[i];
+			}
+			avg_hr = hr_sum / t_hr_samples;
 
+			hr_rlng_avg = (hr_samples[sample[0]] + hr_samples[sample[1]] + hr_samples[sample[2]])/3;
+
+			if ((hr_rlng_avg > avg_hr) && (beat_started == 0))
+			{
+				beat_started = 1;
+				btwn_beats[sample[0]] = btwn_bt_ctr;
+				btwn_bt_ctr = 0;
+				SET_BIT(PORTC, 5);
+				//do something to start measuring duration
+			}
+			else if ((hr_rlng_avg < avg_hr) && (beat_started == 1))
+			{
+				beat_started = 0;
+				CLEAR_BIT(PORTC,5);
+			}
+
+			time_sum = 0;
+			for (i=0; i< beats_to_avg; i++)
+			{
+				time_sum = time_sum+btwn_beats[i];
+			}
+			avg_beat_time = time_sum / beats_to_avg;
 
 			lcd_puts("\n");
 
@@ -128,7 +166,7 @@ int main(void){
 			}
 
 		}	
-*/
+
 		//go back to sleep now
 		sleep_now();	// sleep for 1 ms
 	}
