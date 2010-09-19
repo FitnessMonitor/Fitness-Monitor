@@ -1,3 +1,5 @@
 This is the working branch for Dan Cole.
 
-You can use the submit.ext script by using the command:		sh ./submit.ext your message with spaces
+You can use the submit.git script by using the command:		sh ./submit.git your message with spaces
+
+Onus is a Python computer program for Linux.
