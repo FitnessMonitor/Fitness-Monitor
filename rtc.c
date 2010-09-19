@@ -33,10 +33,11 @@ extern void RTC_get_dhms (volatile uint32_t * RTC_count, int16_t * days, int8_t 
 	*seconds = s;
 
 }
+//4294967296
 
-extern void RTC_set_dhms (uint32_t * RTC_count, uint8_t days, uint8_t hours, uint8_t minutes, uint8_t seconds)
+extern void RTC_set_dhms (volatile uint32_t * RTC_count, int16_t days, int8_t hours, int8_t minutes, int8_t seconds)
 {
-	*RTC_count = (days*86400) + (hours*3600) + (minutes*60) + seconds;
+	*RTC_count = (days * 86400) + (hours * 3600) + (minutes * 60) + seconds;
 }
 
 

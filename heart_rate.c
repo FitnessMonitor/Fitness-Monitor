@@ -3,13 +3,13 @@
 extern uint8_t HR_calculate_avg(uint8_t * value, uint8_t len)
 {
 	uint8_t hr_avg;
-	uint16_t hr_sum = 0;		//clear the sum
+	uint16_t hr_sum = 0;		
 	uint8_t i;
-	for (i=0; i<40; i++)
+	for (i=0; i<len; i++)
 	{
 		hr_sum = hr_sum + value[i];
 	}
-	hr_avg = hr_sum / 40;
+	hr_avg = hr_sum / len;
 	
 	return hr_avg;
 }
