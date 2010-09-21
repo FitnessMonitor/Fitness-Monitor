@@ -20,11 +20,11 @@ extern void RTC_get_dhms (volatile uint32_t * RTC_count, int16_t * days, int8_t 
 	count = *RTC_count;
 		
 	d = count/86400;
-	count = count - (*days*86400);
+	count = count - (d * 86400);
 	h = count/3600;
-	count = count - (*hours*3600);
+	count = count - (h * 3600);
 	m = count/60;
-	count = count - (*minutes*60);
+	count = count - (m * 60);
 	s = count;
 
 	*days = d;

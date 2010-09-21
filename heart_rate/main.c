@@ -10,6 +10,7 @@
 #include "../lcd.c"
 #include "../rtc.c"
 //#include "../heart_rate.c"
+//test
 
 //Macros for setting, clearing and toogleing bits.
 #define SET_BIT(PORT, BITNUM) ((PORT) |= (1<<(BITNUM)))
@@ -69,9 +70,9 @@ int main(void){
 	RTC_sec_counter = 0;
 	
 	int16_t days = 0;
-	int8_t hours = 0;
-	int8_t minutes = 0;
-	int8_t seconds = 0;
+	int8_t hours = 24;
+	int8_t minutes = 59;
+	int8_t seconds = 58;
 
 	timer2_1ms_setup();
 
