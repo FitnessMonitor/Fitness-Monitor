@@ -16,16 +16,22 @@
 #define CLEAR_BIT(PORT, BITNUM) ((PORT) &= ~(1<<(BITNUM)))
 #define TOGGLE_BIT(PORT, BITNUM) ((PORT) ^= (1<<(BITNUM)))
 
-#define t_hr_samples 40
-#define beats_to_avg 10
+
+#define hr_sample_rate 100  //sample every 100ms
+#define t_hr_samples 40 //(40000 / hr_sample_rate)
+#define beats_to_avg 10 //(t_hr_samples / 4)
+#define starting_avg_hr_val 90
+#define starting_avg_hr 1000
 
 volatile uint32_t RTC_sec_counter;
 volatile uint16_t RTC_ms_counter;
 
-volatile uint8_t hr_samples[50];
+volatile uint8_t hr_samples[t_hr_samples+1];
 volatile uint8_t sample[3] = {0, 1, 2};
 volatile uint8_t hr_counter;
+
 volatile uint16_t btwn_bt_ctr;
+
 
 ISR( PCINT2_vect ) 
 {
@@ -77,14 +83,28 @@ int main(void){
 	RTC_set_dhms (&RTC_sec_counter, days, hours, minutes, seconds);
 
 	uint16_t hr_sum = 0;
-	uint8_t avg_hr = 0;
+	uint8_t avg_hr_val = 0;
+	uint8_t hr_min_val = 0;
+	uint8_t hr_max_val = 0;
 	uint8_t hr_rlng_avg;
 	uint8_t beat_started = 0;
 	uint16_t btwn_beats[50];
+	uint8_t beat = 0;
 	uint32_t time_sum = 0;
 	uint16_t avg_beat_time;
+	uint16_t avg_hr = 0;
+	char avg_hr_str[5];
+	
 
 	uint8_t i;
+
+
+
+	for (i=0; i<t_hr_samples; i++)
+	{
+		hr_samples[i] = starting_avg_hr_val;
+		btwn_beats[i] = starting_avg_hr;
+	}
 
 
 	while(1)
@@ -98,9 +118,10 @@ int main(void){
 			itoa(minutes, min_str,10);
 			itoa(hours, hr_str,10);
 			itoa(days, day_str,10);
+			ultoa(avg_hr, avg_hr_str,10);
 			lcd_clrscr();
-			lcd_putc(hr_str[0]);
-			lcd_putc(hr_str[1]);
+			lcd_putc(day_str[0]);
+			lcd_putc(day_str[1]);
 			lcd_puts(":");			
 			lcd_putc(hr_str[0]);
 			lcd_putc(hr_str[1]);
@@ -110,38 +131,56 @@ int main(void){
 			lcd_puts(":");
 			lcd_putc(sec_str[0]);
 			lcd_putc(sec_str[1]);
+			lcd_puts("\n");
+			lcd_putc(avg_hr_str[0]);
+			lcd_putc(avg_hr_str[1]);
+			lcd_putc(avg_hr_str[2]);
+			lcd_putc(avg_hr_str[3]);
+			lcd_putc(avg_hr_str[4]);
 			RTC_ms_counter = 0;
 		}
 
-		if(hr_counter >=100)
+		if(hr_counter >=50)
 		{
 			hr_counter = 0;
 			hr_samples[sample[0]] = 0;
 
 			ADC_start_single_conversion();
-
+			
+			// wait for the ADC to finish
 			while(hr_samples[sample[0]] == 0)
 			{
 				//do nothing
 			}
 			
+			hr_sum = 0;
+			hr_min_val = 255;
+			hr_max_val = 0;			
 			for (i=0; i<t_hr_samples; i++)
 			{
+				if (hr_min_val > hr_samples[i])
+				{
+					hr_min_val = hr_samples[i];
+				}
+				if (hr_max_val < hr_samples[i])
+				{
+					hr_max_val = hr_samples[i];
+				}
 				hr_sum = hr_sum + hr_samples[i];
 			}
-			avg_hr = hr_sum / t_hr_samples;
+			avg_hr_val = hr_sum / t_hr_samples;
 
 			hr_rlng_avg = (hr_samples[sample[0]] + hr_samples[sample[1]] + hr_samples[sample[2]])/3;
 
-			if ((hr_rlng_avg > avg_hr) && (beat_started == 0))
+			if ((hr_rlng_avg > avg_hr_val) && (beat_started == 0))
 			{
 				beat_started = 1;
-				btwn_beats[sample[0]] = btwn_bt_ctr;
+				btwn_beats[beat] = btwn_bt_ctr;
 				btwn_bt_ctr = 0;
 				SET_BIT(PORTC, 5);
-				//do something to start measuring duration
+				
 			}
-			else if ((hr_rlng_avg < avg_hr) && (beat_started == 1))
+			else if ((hr_rlng_avg < avg_hr_val) && (beat_started == 1))
 			{
 				beat_started = 0;
 				CLEAR_BIT(PORTC,5);
@@ -153,8 +192,12 @@ int main(void){
 				time_sum = time_sum+btwn_beats[i];
 			}
 			avg_beat_time = time_sum / beats_to_avg;
-
-			lcd_puts("\n");
+			avg_hr = 60000 / avg_beat_time;
+			
+			if ((hr_max_val-hr_min_val)<5)
+			{
+			//	lcd_puts("woops");
+			}
 
 			for (i=0; i<3; i++)
 			{
@@ -163,6 +206,11 @@ int main(void){
 				{
 					sample[i] = 0;
 				}	
+			}
+			beat++;
+			if (beat >=beats_to_avg)
+			{
+				beat = 0;
 			}
 
 		}	
