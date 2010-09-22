@@ -5,7 +5,7 @@
 #include <avr/interrupt.h>
 #include "../spi.c"
 #include "../nRF24L01.c"
-#include "../sleep.c"
+//#include "../sleep.c"
 
 uint8_t nRF24L01_data[32];
 uint8_t *buffer =  &nRF24L01_data[0];
@@ -25,7 +25,7 @@ ISR( PCINT2_vect )
 
 ISR(TIMER2_OVF_vect)	//when timer 2 interrupts
 {			//wake up from sleeping
-	sleep_disable();
+//	sleep_disable();
 }
 
 ISR( BADISR_vect ){} //handle potential bad interrupt vectors by doing nothing
@@ -52,7 +52,7 @@ int main(void){
 	{
 		while (!nRF24L01_data_ready())		//wait for packet from nRF24L01+
 		{
-		sleep_ms(1);
+		_delay_ms(1);
 		}
 		_delay_us(100);				//wait 100us before reading the data
 		nRF24L01_get_data(buffer);			//get the data from the nRF24L01+ and store it in the buffer

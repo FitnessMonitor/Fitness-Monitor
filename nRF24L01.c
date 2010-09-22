@@ -6,6 +6,7 @@
 // Defines for setting the nRF24L01 registers for transmitting or receiving mode
 #define TX_POWERUP nRF24L01_config_register(CONFIG, nRF24L01_CONFIG | ( (1<<PWR_UP) | (0<<PRIM_RX) ) )
 #define RX_POWERUP nRF24L01_config_register(CONFIG, nRF24L01_CONFIG | ( (1<<PWR_UP) | (1<<PRIM_RX) ) )
+#define PWR_DOWN nRF24L01_config_register(CONFIG, nRF24L01_CONFIG | ( (0<<PWR_UP) | (0<<PRIM_RX) ) )
 
 // Flag which denotes transmitting mode
 volatile uint8_t PTX;
@@ -37,6 +38,10 @@ void nRF24L01_config()
 
 	// Set length of incoming payload 
 	nRF24L01_config_register(RX_PW_P0, nRF24L01_PAYLOAD);
+	
+	//configure 1Mbps	
+	uint8_t nRF24L01_PWR_RATE =  ( (0<<LNA_HCURR) | (00<RF_PWR) | (0<<RF_DR)); // 18dbm & 1Mbps
+	nRF24L01_write_register(RF_SETUP, &nRF24L01_PWR_RATE,1);
 
 	// Reset status register
 	nRF24L01_config_register(STATUS,((1<<TX_DS)|(1<<MAX_RT))); 
@@ -45,6 +50,7 @@ void nRF24L01_config()
 	PTX = 0;        	// Start in receiving mode
 	RX_POWERUP;     	// Power up in receiving mode
 	nRF24L01_CE_hi;		// Listening for pakets
+	//nRF24L01_CE_lo;
 }
 
 
@@ -80,8 +86,9 @@ extern void nRF24L01_interrupt ()
    	nRF24L01_CSN_hi;			// Pull up chip select
 
         nRF24L01_CE_lo;				// Deactivate transreceiver
-        RX_POWERUP;                             // Power up in receiving mode
-        nRF24L01_CE_hi;				// Listening for pakets
+        //RX_POWERUP;                             // Power up in receiving mode
+	PWR_DOWN;
+        //nRF24L01_CE_hi;			// Listening for pakets
         PTX = 0;				// Set to receiving mode
 
         // Reset status register for further interaction
