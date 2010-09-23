@@ -233,10 +233,11 @@ void IoInit ()
 
 int main (void)
 {
+	DDRC |= 1<<PC2;
 	FATFS FileSystemObject;
 
 	if(f_mount(0, &FileSystemObject)!=FR_OK) {
-		//flag error
+		PORTC |= (1<<PC2);
 	}
 
 	DSTATUS driveStatus = disk_initialize(0);

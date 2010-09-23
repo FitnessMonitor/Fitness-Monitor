@@ -1,10 +1,7 @@
 
 [Anjuta]
 Maximized=1
-Geometry=1440x825+1024+25
-
-[Project Manager]
-Shortcut=C file:///home/dancole/Desktop/Dropbox/GIT/Fitness-Monitor/Onus/src onus.py %%%C file:///home/dancole/Desktop/Dropbox/GIT/Fitness-Monitor/Onus/src onus 
+Geometry=1024x746+0+0
 
 [File Loader]
 Files=file:///home/dancole/Desktop/Dropbox/GIT/Fitness-Monitor/Onus/src/onus.py#1%%%file:///home/dancole/Desktop/Dropbox/GIT/Fitness-Monitor/Onus/onus.glade
@@ -13,8 +10,13 @@ Files=file:///home/dancole/Desktop/Dropbox/GIT/Fitness-Monitor/Onus/src/onus.py#
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
 
 [Execution]
+Program arguments=
+Program uri=file:///home/dancole/Desktop/Dropbox/GIT/Fitness-Monitor/Onus/src/onus.py
 Run in terminal=2
 Working directories=file:///home/dancole/Desktop/Dropbox/GIT/Fitness-Monitor/Onus
+
+[Project Manager]
+Shortcut=C file:///home/dancole/Desktop/Dropbox/GIT/Fitness-Monitor/Onus/src onus.py %%%C file:///home/dancole/Desktop/Dropbox/GIT/Fitness-Monitor/Onus/src onus 
 
 [Build]
 Configuration list=1:Default:%%%1:Debug:Debug%%%1:Profiling:Profiling%%%1:Optimized:Optimized
