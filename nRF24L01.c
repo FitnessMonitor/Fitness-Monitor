@@ -6,7 +6,7 @@
 // Defines for setting the nRF24L01 registers for transmitting or receiving mode
 #define TX_POWERUP nRF24L01_config_register(CONFIG, nRF24L01_CONFIG | ( (1<<PWR_UP) | (0<<PRIM_RX) ) )
 #define RX_POWERUP nRF24L01_config_register(CONFIG, nRF24L01_CONFIG | ( (1<<PWR_UP) | (1<<PRIM_RX) ) )
-#define PWR_DOWN nRF24L01_config_register(CONFIG, nRF24L01_CONFIG | ( (0<<PWR_UP) | (0<<PRIM_RX) ) )
+#define PWR_DOWN nRF24L01_config_register(CONFIG, nRF24L01_CONFIG | ( (0<<PWR_UP) | (1<<PRIM_RX) ) )
 
 // Flag which denotes transmitting mode
 volatile uint8_t PTX;
@@ -88,7 +88,7 @@ extern void nRF24L01_interrupt ()
         nRF24L01_CE_lo;				// Deactivate transreceiver
         //RX_POWERUP;                             // Power up in receiving mode
 	PWR_DOWN;
-        //nRF24L01_CE_hi;			// Listening for pakets
+        nRF24L01_CE_hi;			// Listening for pakets
         PTX = 0;				// Set to receiving mode
 
         // Reset status register for further interaction

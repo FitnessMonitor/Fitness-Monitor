@@ -173,7 +173,7 @@ int main(void){
 
 			hr_rlng_avg = (hr_samples[sample[0]] + hr_samples[sample[1]] + hr_samples[sample[2]])/3;
 
-			if ((hr_rlng_avg > avg_hr_val) && (beat_started == 0))
+			if ((hr_samples[sample[0]] > avg_hr_val) && (beat_started == 0))
 			{
 				beat_started = 1;
 				btwn_beats[beat] = btwn_bt_ctr;
@@ -181,7 +181,7 @@ int main(void){
 				SET_BIT(PORTC, 5);
 				
 			}
-			else if ((hr_rlng_avg < avg_hr_val) && (beat_started == 1))
+			else if ((hr_samples[sample[0]] < avg_hr_val) && (beat_started == 1) && (btwn_bt_ctr > 300))
 			{
 				beat_started = 0;
 				CLEAR_BIT(PORTC,5);
@@ -190,7 +190,7 @@ int main(void){
 			time_sum = 0;
 			for (i=0; i< beats_to_avg; i++)
 			{
-				time_sum = time_sum+btwn_beats[i];
+				time_sum = time_sum + btwn_beats[i];
 			}
 			avg_beat_time = time_sum / beats_to_avg;
 			avg_hr = 60000 / avg_beat_time;
