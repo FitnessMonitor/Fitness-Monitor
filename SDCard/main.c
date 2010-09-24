@@ -8,16 +8,16 @@
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include <string.h>
-#include "uart.c"
+#include <util/delay.h>
+#include "ff.h"
 #include "ff.c"
 #include "mmc.c"
-#include "rtc.c"
+#include "xitoa.h"
+#include "diskio.h"
 #include "ccsbcs.c"
 #include "uart.h"
-#include "xitoa.h"
-#include "ff.h"
-#include "diskio.h"
-
+#include "uart.c"
+#include "rtc.c"
 
 
 DWORD acc_size;				/* Work register for fs command */
@@ -186,28 +186,15 @@ void put_rc (FRESULT rc)
 }
 
 
-
-
-static
-void IoInit ()
+static void IoInit ()
 {
-//	PORTA = 0b11111111;	// Port A
+	PORTB = 0b10110000; 	// Port B
+	DDRB  = 0b00001000;
 
-//	PORTB = 0b10110000; // Port B
-//	DDRB  = 0b11000000;
+	DDRC |= 1<<PC3;
+	DDRC |= 1<<PC2;
 
-//	PORTC = 0b11111111;	// Port C
-
-//	PORTD = 0b11111111; // Port D
-
-//	PORTE = 0b11110010; // Port E
-//	DDRE  = 0b10000010;
-
-//	PORTF = 0b11111111;	// Port F
-
-//	PORTG = 0b11111; 	// Port G
-
-	uart_init();		// Initialize UART driver
+	//uart_init();		// Initialize UART driver
 
 /*
 	OCR1A = 51;			// Timer1: LCD bias generator (OC1B)
@@ -215,24 +202,33 @@ void IoInit ()
 	TCCR1A = 0b00010000;
 	TCCR1B = 0b00001010;
 */
-	OCR2A = 90-1;		// Timer2: 100Hz interval (OC2)
-	TCCR2A = 0b00000010;
-	TCCR2B = 0b00000101;
-	TIMSK2 = 0b00000010;   // Enable TC2.oc interrupt 
+	//OCR2A = 90-1;		// Timer2: 100Hz interval (OC2)
+	//TCCR2A = 0b00000010;
+	//TCCR2B = 0b00000101;
+	//TIMSK2 = 0b00000010;   // Enable TC2.oc interrupt 
 
-	rtc_init();			// Initialize RTC
+	//rtc_init();			// Initialize RTC
 
 //	sei();
 }
 
-
-
-/*-----------------------------------------------------------------------*/
-/* Main                                                                  */
-
+void delayms(uint16_t millis) {
+  while ( millis ) {
+    _delay_ms(1);
+    millis--;
+  }
+}
 
 int main (void)
 {
+	IoInit();
+	while(1) 
+	{
+		PORTC ^= (1<<PC3);
+		PORTC ^= (1<<PC2);
+		delayms(1000);
+	}
+/*
 	DDRC |= 1<<PC2;
 	FATFS FileSystemObject;
 
@@ -264,6 +260,6 @@ int main (void)
 	//Close and unmount. 
 	f_close(&logFile);
 	f_mount(0,0);
-
+*/
 }
 

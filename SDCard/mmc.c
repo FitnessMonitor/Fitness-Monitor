@@ -10,7 +10,7 @@
 #include "diskio.h"
 
 /*SPI configuration*/
-#define DD_MOSI   DDB4
+#define DD_MOSI   DDB3
 #define DD_SCK   DDB5
 #define DDR_SPI   DDRB
 #define DD_SS   2

@@ -85,7 +85,7 @@
 /                   Fixed f_mkfs() creates wrong FAT32 volume.
 /---------------------------------------------------------------------------*/
 
-#include "ff.h"			/* FatFs configurations and declarations */
+//#include "ff.h"			/* FatFs configurations and declarations */
 #include "diskio.h"		/* Declarations of low level disk I/O functions */
 
 
