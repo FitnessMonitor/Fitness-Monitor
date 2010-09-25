@@ -194,6 +194,15 @@ static void IoInit ()
 	DDRC |= 1<<PC3;
 	DDRC |= 1<<PC2;
 
+/*
+	TIMSK0 |= 1 << OCIE0A;  //enable interrupt for timer match a 
+	OCR0A = 78;  // 10 ms interrupt at 8MHz
+	TCCR0B |= (1 << CS02) | (1 << CS00);  //speed = F_CPU/1024
+	//power_timer0_enable();
+
+	sei();
+*/
+
 	//uart_init();		// Initialize UART driver
 
 /*
@@ -221,12 +230,33 @@ void delayms(uint16_t millis) {
 
 int main (void)
 {
+
 	IoInit();
-	while(1) 
-	{
-		PORTC ^= (1<<PC3);
-		PORTC ^= (1<<PC2);
-		delayms(1000);
+	FATFS FileSystemObject;
+
+	if(f_mount(0, &FileSystemObject)!=FR_OK) {
+		//flag error.
+	}
+
+	delayms(10000);
+
+	DSTATUS driveStatus = disk_initialize(0);
+
+	if(driveStatus & STA_NOINIT || driveStatus & STA_NODISK || driveStatus & STA_PROTECT) {
+		while(1) 
+		{
+			PORTC ^= (1<<PC3);
+			PORTC ^= (1<<PC2);
+			delayms(5000);
+		}
+	}
+	else {
+		while(1) 
+		{
+			PORTC ^= (1<<PC3);
+			PORTC ^= (1<<PC2);
+			delayms(500);
+		}
 	}
 /*
 	DDRC |= 1<<PC2;
