@@ -238,16 +238,19 @@ int main (void)
 		//flag error.
 	}
 
-	delayms(10000);
+	delayms(5000);
 
 	DSTATUS driveStatus = disk_initialize(0);
 
-	if(driveStatus & STA_NOINIT || driveStatus & STA_NODISK || driveStatus & STA_PROTECT) {
+// driveStatus & STA_NOINIT || driveStatus & STA_NODISK || driveStatus & STA_PROTECT
+// With No SD Card	driveStatus = 1,	STA_NOINIT = 1, 	STA_NODISK = 1, 	STA_PROTECT = 1
+// With SD Card		driveSratus = 1,
+	if(driveStatus & STA_NODISK) {
 		while(1) 
 		{
 			PORTC ^= (1<<PC3);
 			PORTC ^= (1<<PC2);
-			delayms(5000);
+			delayms(200);
 		}
 	}
 	else {
@@ -255,9 +258,10 @@ int main (void)
 		{
 			PORTC ^= (1<<PC3);
 			PORTC ^= (1<<PC2);
-			delayms(500);
+			delayms(1000);
 		}
 	}
+
 /*
 	DDRC |= 1<<PC2;
 	FATFS FileSystemObject;
