@@ -2,18 +2,12 @@
 /  Low level disk interface modlue include file   (C)ChaN, 2010
 /-----------------------------------------------------------------------*/
 
-#ifndef DEF_DISKIO
-#define DEF_DISKIO
+#ifndef _DISKIO
+
+#define _READONLY	0	/* 1: Remove write functions */
+#define _USE_IOCTL	1	/* 1: Use disk_ioctl fucntion */
 
 #include "integer.h"
-
-#define DN_MCI		0	/* Physical drive number for MCI */
-#define DN_NAND		1	/* Physical drive number for NAND flash */
-
-
-/* These functions are defined in asmfunc.S */
-void Copy_al2un (BYTE *dst, const DWORD *src, int count);	/* Copy aligned to unaligned. */
-void Copy_un2al (DWORD *dst, const BYTE *src, int count);	/* Copy unaligned to aligned. */
 
 
 /* Status of Disk Functions */
@@ -32,12 +26,15 @@ typedef enum {
 /*---------------------------------------*/
 /* Prototypes for disk control functions */
 
+int assign_drives (int, int);
 DSTATUS disk_initialize (BYTE);
 DSTATUS disk_status (BYTE);
 DRESULT disk_read (BYTE, BYTE*, DWORD, BYTE);
+#if	_READONLY == 0
 DRESULT disk_write (BYTE, const BYTE*, DWORD, BYTE);
+#endif
 DRESULT disk_ioctl (BYTE, BYTE, void*);
-void disk_timerproc (void);
+
 
 
 /* Disk Status Bits (DSTATUS) */
@@ -49,14 +46,14 @@ void disk_timerproc (void);
 
 /* Command code for disk_ioctrl fucntion */
 
-/* Generic ioctl command (defined for FatFs) */
+/* Generic command (defined for FatFs) */
 #define CTRL_SYNC			0	/* Flush disk cache (for write functions) */
 #define GET_SECTOR_COUNT	1	/* Get media size (for only f_mkfs()) */
 #define GET_SECTOR_SIZE		2	/* Get sector size (for multiple sector size (_MAX_SS >= 1024)) */
 #define GET_BLOCK_SIZE		3	/* Get erase block size (for only f_mkfs()) */
 #define CTRL_ERASE_SECTOR	4	/* Force erased a block of sectors (for only _USE_ERASE) */
 
-/* Generic ioctl command */
+/* Generic command */
 #define CTRL_POWER			5	/* Get/Set power status */
 #define CTRL_LOCK			6	/* Lock/Unlock media removal */
 #define CTRL_EJECT			7	/* Eject media */
@@ -77,5 +74,5 @@ void disk_timerproc (void);
 #define NAND_FORMAT			30	/* Create physical format */
 
 
-
+#define _DISKIO
 #endif
