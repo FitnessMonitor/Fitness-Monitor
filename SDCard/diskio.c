@@ -51,8 +51,10 @@
 #define CT_BLOCK	0x08		/* Block addressing */
 
 /* Port Controls  (Platform dependent) */
-#define CS_LOW()	PORTB &= ~1		/* MMC CS = L */
-#define	CS_HIGH()	PORTB |= 1		/* MMC CS = H */
+//#define CS_LOW()	PORTB &= ~1		/* MMC CS = L */
+//#define	CS_HIGH()	PORTB |= 1		/* MMC CS = H */
+#define CS_LOW()	SD_CS_PORT &= ~(1<<SD_CS_PIN)      /* MMC CS = L */
+#define CS_HIGH()	SD_CS_PORT |=  (1<<SD_CS_PIN)      /* MMC CS = H */ 
 
 #define	FCLK_SLOW()	SPCR = 0x52		/* Set slow clock (100k-400k) */
 #define	FCLK_FAST()	SPCR = 0x50		/* Set fast clock (depends on the CSD) */

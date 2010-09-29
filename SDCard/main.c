@@ -43,68 +43,18 @@ int main (void)
 		PORTC |= (1<<PC2);
 	}
 
+	if (Stat & STA_NODISK) {
+		PORTC |= (1<<PC3);
+	}
+	else {
+		while(1) {
+			PORTC ^= (1<<PC3);
+		}
+	}
+/*
 	//_delay_ms(1000);
 
 	DSTATUS driveStatus = disk_initialize(0);
-
-// driveStatus & STA_NOINIT || driveStatus & STA_NODISK || driveStatus & STA_PROTECT
-//#define CT_MMC		0x01		/* MMC ver 3 */
-//#define CT_SD1		0x02		/* SD ver 1 */
-//#define CT_SD2
-	if(CardType == 0x00) {
-		while(1) 
-		{
-			PORTC ^= (1<<PC3);
-			PORTC ^= (1<<PC2);
-			_delay_ms(200);
-		}
-	}
-	else if (CardType = 0x01) {
-		PORTC ^= (1<<PC3);
-		while(1) 
-		{
-			PORTC ^= (1<<PC3);
-			PORTC ^= (1<<PC2);
-			_delay_ms(200);
-		}
-	}
-	else if (CardType = 0x02) {
-		while(1) 
-		{
-			PORTC |= (1<<PC3);
-			PORTC |= (1<<PC2);
-			_delay_ms(200);
-		}
-	}
-	else {
-		while(1) 
-		{
-			PORTC |= (1<<PC3);
-			PORTC &= (1<<PC2);
-			_delay_ms(200);
-		}
-	}
-
-
-
-/*
-	DDRC |= 1<<PC2;
-	FATFS FileSystemObject;
-
-	if(f_mount(0, &FileSystemObject)!=FR_OK) {
-		PORTC |= (1<<PC2);
-	}
-
-	DSTATUS driveStatus = disk_initialize(0);
-
-	if(driveStatus & STA_NOINIT || driveStatus & STA_NODISK || driveStatus & STA_PROTECT) {
-		//flag error.
-	}
-
-	//  Sometimes you may want to format the disk.
-	if(f_mkfs(0,0,0)!=FR_OK) {
-		//error
-	}
 
 	FIL logFile;
 	//works
