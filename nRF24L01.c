@@ -6,7 +6,7 @@
 // Defines for setting the nRF24L01 registers for transmitting or receiving mode
 #define TX_POWERUP nRF24L01_config_register(CONFIG, nRF24L01_CONFIG | ( (1<<PWR_UP) | (0<<PRIM_RX) ) )
 #define RX_POWERUP nRF24L01_config_register(CONFIG, nRF24L01_CONFIG | ( (1<<PWR_UP) | (1<<PRIM_RX) ) )
-#define PWR_DOWN nRF24L01_config_register(CONFIG, nRF24L01_CONFIG | ( (0<<PWR_UP) | (1<<PRIM_RX) ) )
+#define PWR_DOWN nRF24L01_config_register(CONFIG, nRF24L01_CONFIG | ( (0<<PWR_UP) | (0<<PRIM_RX) ) )
 
 // Flag which denotes transmitting mode
 volatile uint8_t PTX;
@@ -71,37 +71,64 @@ void nRF24L01_set_TADDR(uint8_t * adr)
 
 extern void nRF24L01_interrupt () 
 {
-    uint8_t status;   
-    // If still in transmitting mode then finish transmission
-    PORTD ^= 1<<0; //toggle bit
-    if (PTX) {
-    
         // Read nRF24L01 status 
+	uint8_t status;
         nRF24L01_CSN_lo;			// Pull down chip select
         status = spi_transmit_byte(NOP);	// Read status register
         nRF24L01_CSN_hi;			// Pull up chip select
+	
+	//based upon the status register decide what to do
 
-    	nRF24L01_CSN_lo;			// Pull down chip select
+
+	//if TX sucess
+	if ( status & (1<<TX_DS) )
+	{
+		nRF24L01_powerdown();		// Return to low power state
+	}
+	//maximum retrys reached
+	else if ( status & (1<<MAX_RT) )
+	{
+		//set some flag
+		nRF24L01_powerdown();		// Return to low power state
+	}
+	//recieved a packet
+	else if ( status & (1<<RX_DR) )
+	{
+		nRF24L01_get_data(buffer);
+		nRF24L01_powerdown();
+	}
+
+        // Reset status register for further interaction
+        nRF24L01_config_register(STATUS,( (1<<RX_DR) | (1<<TX_DS) | (1<<MAX_RT) ) ); // Reset status register
+
+}
+
+extern void nRF24L01_powerdown()
+//place nRF24L01 in powerdown mode
+{
+	//empty the TX FIFO
+	nRF24L01_CSN_lo;			// Pull down chip select
     	spi_transmit_byte( FLUSH_TX );		// Write cmd to flush tx fifo
    	nRF24L01_CSN_hi;			// Pull up chip select
 
-        nRF24L01_CE_lo;				// Deactivate transreceiver
-        //RX_POWERUP;                             // Power up in receiving mode
-	PWR_DOWN;
-        nRF24L01_CE_hi;			// Listening for pakets
-        PTX = 0;				// Set to receiving mode
-
-        // Reset status register for further interaction
-        nRF24L01_config_register(STATUS,(1<<TX_DS)|(1<<MAX_RT)); // Reset status register
-    }
+        nRF24L01_CE_lo;				// Deactivate transceiver
+	PWR_DOWN;				// power down transceiver
+        nRF24L01_CE_hi;				// 
 }
+extern void nRF24L01_RX_powerup()
+//place nRF24L01 in recieve mode
+{
+        nRF24L01_CE_lo;				// Deactivate transceiver
+	RX_POWERUP;				// power down transceiver
+        nRF24L01_CE_hi;				// Listening for pakets
+}
+
 
 extern uint8_t nRF24L01_data_ready() 
 // Checks if data is available for reading
 {
-	if (PTX) return 0;
-	uint8_t status;
 	// Read nRF24L01 status 
+	uint8_t status;
 	nRF24L01_CSN_lo;				// Pull down chip select
 	status = spi_transmit_byte(NOP);		// Read status register
 	nRF24L01_CSN_hi;				// Pull up chip select

@@ -1,13 +1,28 @@
 #include "ADC.h"
 
-extern void ADC_init()	//initialize ADC
+#define ADC0 0x00
+#define ADC1 0x01
+#define ADC2 0x02
+#define ADC3 0x03
+#define ADC4 0x04
+#define ADC5 0x05
+#define ADC6 0x06
+#define ADC7 0x07
+#define ADC8 0x08
+
+extern void ADC_init(int ADC_channel)	//initialize ADC
 {
-   ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); // Set ADC prescaler to 128 - 125KHz sample rate @ 16MHz
+	//bring ADC out of low power state
+	ADCSRA |= (0 << ADPS2) | (0 << ADPS1) | (1 << ADPS0);  //set ADC clock prescaler to 2
 
-   ADMUX |= (1 << REFS0); // Set ADC reference to AVCC
-   ADMUX |= (1 << ADLAR); // Left adjust ADC result to allow easy 8 bit reading
+	ADMUX |= (1 << REFS1) | (1 << REFS0); // AVCC as reference with external capacitor at AREF pin
+	ADMUX |= (1 << ADLAR) | ADC_channel; // Left adjust ADC result to allow easy 8 bit reading
 
-   // No MUX values needed to be changed to use ADC0
+	DIDR0 =0;
+	DIDR0 |= (1<<ADC_channel);
+
+
+	// No MUX values needed to be changed to use ADC0
 }
 
 extern void ADC_start_single_conversion()
@@ -17,6 +32,11 @@ extern void ADC_start_single_conversion()
 	ADC_interrupt_enable();
 	//ADC_running = 1;
 	ADC_start_conversion();
+}
+
+extern void ADC_shutdown()
+{
+	ADC_disable();
 }
 
 

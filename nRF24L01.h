@@ -4,7 +4,9 @@
 // nRF24L01 settings
 #define nRF24L01_CH         2
 #define nRF24L01_PAYLOAD    1
-#define nRF24L01_CONFIG     ( (1<<MASK_RX_DR) | (1<<EN_CRC) | (0<<CRCO) )
+
+//RX_DR,TX_DS,MAX_RT will all cause an interrupt on IRQ
+#define nRF24L01_CONFIG     ( (0<<MASK_RX_DR) | (0<<MASK_TX_DS) | (0<<MASK_MAX_RT) | (1<<EN_CRC) | (0<<CRCO) )
 
 // Pin definitions for chip select and chip enabled of the nRF24L01 module
 #define CE  PB0
@@ -102,6 +104,8 @@ extern void nRF24L01_set_TADDR(uint8_t * adr);
 extern void nRF24L01_interrupt ();
 extern uint8_t nRF24L01_data_ready();
 extern void nRF24L01_get_data(uint8_t * data);
+extern void nRF24L01_RX_powerup()
+extern void nRF24L01_powerdown()
 
 // Public extended functions
 extern void nRF24L01_config_register(uint8_t reg, uint8_t value);

@@ -1,5 +1,4 @@
-//RF transmission
-#define F_CPU 8000000UL /* 8 MHz Internal Oscillator */
+#define F_CPU 1000000UL /* 8 MHz Internal Oscillator */
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdlib.h>
@@ -27,8 +26,8 @@
 volatile uint32_t RTC_sec_counter;
 volatile uint16_t RTC_ms_counter;
 
-volatile uint8_t hr_samples[t_hr_samples+1];
-volatile uint8_t sample[3] = {0, 1, 2};
+volatile uint16_t hr_samples[t_hr_samples+1];
+volatile uint8_t sample;
 volatile uint8_t hr_counter;
 
 volatile uint16_t btwn_bt_ctr;
@@ -51,7 +50,7 @@ ISR(TIMER2_OVF_vect)	//when timer 2 interrupts
 
 ISR(ADC_vect)
 {
-	hr_samples[sample[0]] = ADCH;
+	//hr_samples[sample] = ADCH;
 }
 
 int main(void){
@@ -60,34 +59,33 @@ int main(void){
 	SET_BIT(DDRC,5);
 	
 	//initialize ADC
-	ADC_init();
+	ADC_init(ADC0);
 	
 	//initialize LCD screen
 	lcd_init(LCD_DISP_ON);
 	lcd_clrscr();
-	//lcd_puts("test");
 
-	RTC_sec_counter = 0;
-	
-	int16_t days = 0;
-	int8_t hours = 24;
-	int8_t minutes = 59;
-	int8_t seconds = 58;
-
+	//initialize timer 2 to interrupt ever 1ms
 	timer2_1ms_setup();
 
+	RTC_sec_counter = 0;
+
+	int16_t days = 0;
+	int8_t hours = 0;
+	int8_t minutes = 0;
+	int8_t seconds = 58;
 
 	char sec_str[2];
 	char min_str[2];
 	char hr_str[2];
 	char day_str[3];
-	RTC_set_dhms (&RTC_sec_counter, days, hours, minutes, seconds);
+	
 
 	uint16_t hr_sum = 0;
 	uint8_t avg_hr_val = 0;
 	uint8_t hr_min_val = 0;
 	uint8_t hr_max_val = 0;
-	uint8_t hr_rlng_avg;
+
 	uint8_t beat_started = 0;
 	uint16_t btwn_beats[50];
 	uint8_t beat = 0;
@@ -112,18 +110,27 @@ int main(void){
 	{
 		if(RTC_ms_counter >= 1000)
 		{
+			//calcluate beats per minute (average)
+			time_sum = 0;
+			for (i=0; i< beats_to_avg; i++)
+			{
+				time_sum = time_sum + btwn_beats[i];
+			}
+			avg_beat_time = time_sum / beats_to_avg;
+			avg_hr = 60000 / avg_beat_time;
+
+
 			RTC_sec_counter++;
 			RTC_get_dhms (&RTC_sec_counter, &days, &hours, &minutes, &seconds);
-			lcd_puts("m");
+			lcd_clrscr();
 			itoa(seconds, sec_str,10);
 			itoa(minutes, min_str,10);
 			itoa(hours, hr_str,10);
 			itoa(days, day_str,10);
-			ultoa(avg_hr, avg_hr_str,10);
 			lcd_clrscr();
 			lcd_putc(day_str[0]);
 			lcd_putc(day_str[1]);
-			lcd_puts(":");			
+			lcd_puts(":");
 			lcd_putc(hr_str[0]);
 			lcd_putc(hr_str[1]);
 			lcd_puts(":");
@@ -132,6 +139,10 @@ int main(void){
 			lcd_puts(":");
 			lcd_putc(sec_str[0]);
 			lcd_putc(sec_str[1]);
+
+
+			//ultoa(avg_hr, avg_hr_str,10);
+			ultoa(hr_samples[sample], avg_hr_str,10);
 			lcd_puts("\n");
 			lcd_putc(avg_hr_str[0]);
 			lcd_putc(avg_hr_str[1]);
@@ -141,59 +152,42 @@ int main(void){
 			RTC_ms_counter = 0;
 		}
 
-		if(hr_counter >=50)
+		if(hr_counter >=hr_sample_rate)
 		{
 			hr_counter = 0;
-			hr_samples[sample[0]] = 0;
+			hr_samples[sample] = 0;
 
 			ADC_start_single_conversion();
 			
 			// wait for the ADC to finish
-			while(hr_samples[sample[0]] == 0)
-			{
-				//do nothing
-			}
+			while((ADCSRA & (1<<ADSC))){};
+
+			hr_samples[sample] = ADCL;
+			hr_samples[sample] += (ADCH << 8); 
 			
-			hr_sum = 0;
-			hr_min_val = 255;
-			hr_max_val = 0;			
+			hr_sum = 0;		
 			for (i=0; i<t_hr_samples; i++)
 			{
-				if (hr_min_val > hr_samples[i])
-				{
-					hr_min_val = hr_samples[i];
-				}
-				if (hr_max_val < hr_samples[i])
-				{
-					hr_max_val = hr_samples[i];
-				}
+				//add up the samples
 				hr_sum = hr_sum + hr_samples[i];
+
 			}
 			avg_hr_val = hr_sum / t_hr_samples;
 
-			hr_rlng_avg = (hr_samples[sample[0]] + hr_samples[sample[1]] + hr_samples[sample[2]])/3;
 
-			if ((hr_samples[sample[0]] > avg_hr_val) && (beat_started == 0))
+			if ((hr_samples[sample] > (avg_hr_val+10) ) && (beat_started == 0))
 			{
 				beat_started = 1;
 				btwn_beats[beat] = btwn_bt_ctr;
 				btwn_bt_ctr = 0;
 				SET_BIT(PORTC, 5);
-				
 			}
-			else if ((hr_samples[sample[0]] < avg_hr_val) && (beat_started == 1) && (btwn_bt_ctr > 300))
+			else if ((hr_samples[sample] < avg_hr_val) && (beat_started == 1) && (btwn_bt_ctr > 300))
 			{
 				beat_started = 0;
 				CLEAR_BIT(PORTC,5);
 			}
 
-			time_sum = 0;
-			for (i=0; i< beats_to_avg; i++)
-			{
-				time_sum = time_sum + btwn_beats[i];
-			}
-			avg_beat_time = time_sum / beats_to_avg;
-			avg_hr = 60000 / avg_beat_time;
 			
 			if ((hr_max_val-hr_min_val)<5)
 			{
@@ -202,17 +196,11 @@ int main(void){
 
 			for (i=0; i<3; i++)
 			{
-				sample[i]++;
-				if (sample[i] >= t_hr_samples)
-				{
-					sample[i] = 0;
-				}	
+				sample++;
+				if (sample >= t_hr_samples) sample = 0;
 			}
 			beat++;
-			if (beat >=beats_to_avg)
-			{
-				beat = 0;
-			}
+			if (beat >=beats_to_avg) beat = 0;
 
 		}	
 
