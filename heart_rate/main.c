@@ -28,8 +28,6 @@ ISR(ADC_vect)
 }
 
 
-
-
 int main(void){
 	
 	//initialize ports
