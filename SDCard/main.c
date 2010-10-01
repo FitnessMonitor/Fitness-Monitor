@@ -35,10 +35,11 @@ static void IoInit ()
 
 int main (void)
 {
-
+	
 	IoInit();
+	DESELECT();
 	FATFS FileSystemObject;
-
+/*
 	if(f_mount(0, &FileSystemObject)!=FR_OK) {
 		PORTC |= (1<<PC2);
 	}
@@ -51,10 +52,15 @@ int main (void)
 			PORTC ^= (1<<PC3);
 		}
 	}
-/*
-	//_delay_ms(1000);
 
+	//_delay_ms(1000);
+*/
 	DSTATUS driveStatus = disk_initialize(0);
+
+	if(driveStatus & STA_NOINIT || driveStatus & STA_NODISK || driveStatus & STA_PROTECT) {
+		//flag error.
+	}
+
 
 	FIL logFile;
 	//works
@@ -69,6 +75,6 @@ int main (void)
 	//Close and unmount. 
 	f_close(&logFile);
 	f_mount(0,0);
-*/
+
 }
 

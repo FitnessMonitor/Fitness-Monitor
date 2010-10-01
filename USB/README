@@ -1,0 +1,27 @@
+Author: Daniel Cole
+email:	dcole07@gmail.com
+date:	9-30-2010
+
+Info
+	Fedora 13
+	Python 2.6.4 r264:75706
+	GCC 4.4.4 20100503
+	PySerial
+
+Hardware
+	Breadboarded ATmega168
+		with SparkFun.com 3.3 FTDI Basic Breakout Board that used the FT232R
+	HP Laptop dv9000
+
+Run in terminal
+	python pyterminal.py -b 4800 /dev/ttyUSB0
+
+
+File
+	Laptop
+		pyterminal.py
+
+	Micro-controller
+		main.c
+		uart.c
+		uart.h
