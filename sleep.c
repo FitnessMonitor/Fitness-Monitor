@@ -1,5 +1,4 @@
 #include "sleep.h"
-#include <avr/power.h>
 
 void sleep_init()
 {
@@ -7,11 +6,9 @@ void sleep_init()
 }
 
 
-extern void sleep_now(void)		//function for sleeping multiples of 1ms
+extern void sleep_now(void)		//function to go to sleep
 {
 	sei();				//enable interrupts if not aredy enabled
-	power_twi_disable();
-	power_usart0_disable(); 
 	sleep_init();			//initialize sleep mode
 	sleep_enable();			//enable sleep mode bit
 	sleep_cpu();			//go to selected sleep mode

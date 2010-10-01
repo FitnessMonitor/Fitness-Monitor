@@ -20,7 +20,7 @@ int main(void){
 	//setup UART
 	USARTInit(MYUBRR);
 	
-	char *ptr3 = "Working \r\n ";
+	char *ptr3 = " Working \r\n ";
 	while(1)
 	{	
 		uart_puts(ptr3);

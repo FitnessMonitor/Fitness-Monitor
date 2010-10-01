@@ -4,9 +4,16 @@ extern void timer2_1ms_setup()
 {
 	// set up timer 2 in normal mode with interrupt on overflow
 	TCCR2A = 0x00; 
-	TCCR2B  |= _BV(CS22);	// prescaler of 64
-	TIMSK2 	|= _BV(TOIE2); 	//enable timer 2 overflow interrupt
 
+#if F_CPU == 1000000UL
+	TCCR2B  |= _BV(CS21);	// prescaler of 8
+#elif F_CPU == 8000000UL
+	TCCR2B  |= _BV(CS22);	// prescaler of 64
+#else
+#error F_CPU not defined
+#endif
+	TIMSK2 	|= _BV(TOIE2); 	//enable timer 2 overflow interrupt
+	//reset timer value to overflow in 125 counts (1ms)
 	timer2_1ms_reset();
 }
 
@@ -33,7 +40,6 @@ extern void RTC_get_dhms (volatile uint32_t * RTC_count, int16_t * days, int8_t 
 	*seconds = s;
 
 }
-//4294967296
 
 extern void RTC_set_dhms (volatile uint32_t * RTC_count, int16_t days, int8_t hours, int8_t minutes, int8_t seconds)
 {
