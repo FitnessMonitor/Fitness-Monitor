@@ -60,8 +60,7 @@ int main(void){
 			//wait for the ADC to finish
 			while((ADCSRA & (1<<ADSC))){};
 
-			hr_sample = ADCL;
-			hr_sample += (ADCH << 8); 
+			hr_sample = (ADCH << 8); 
 			
 			ultoa (hr_sample, hr_spl_srting ,10);
 			
