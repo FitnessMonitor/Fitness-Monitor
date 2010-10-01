@@ -6,7 +6,7 @@ extern void ADC_init(int ADC_channel)	//initialize ADC
 	ADCSRA |= (0 << ADPS2) | (0 << ADPS1) | (1 << ADPS0);  //set ADC clock prescaler to 2
 
 	ADMUX |= (1 << REFS1) | (1 << REFS0); // AVCC as reference with external capacitor at AREF pin
-	ADMUX |= (1 << ADLAR) | ADC_channel; // Left adjust ADC result to allow easy 8 bit reading
+	ADMUX |= (0 << ADLAR) | ADC_channel; // do not Left adjust ADC result to allow easy 8 bit reading
 
 	DIDR0 =0;
 	DIDR0 |= (1<<ADC_channel);

@@ -5,6 +5,7 @@
 #include "../sleep.c"
 #include "../rtc.c"
 #include "../uart.c"
+#include "../ADC.c"
 
 //Macros for setting, clearing and toogleing bits.
 #define SET_BIT(PORT, BITNUM) ((PORT) |= (1<<(BITNUM)))
@@ -21,6 +22,13 @@ ISR(TIMER2_OVF_vect)	//when timer 2 interrupts
 	ms_counter++;
 }
 
+ISR(ADC_vect)
+{
+	//hr_samples[sample[0]] = ADCH;
+}
+
+
+
 
 int main(void){
 	
@@ -32,16 +40,35 @@ int main(void){
 
 	//setup UART
 	USARTInit(MYUBRR);
+
+	//initialize ADC
+	ADC_init(ADC0);
 	
-	char *ptr3 = "  Working \r\n  ";
+	char hr_spl_srting[5];
+	char *hr_ptr = &hr_spl_srting;
+	char *newline = " \r\n  ";
+	uint16_t hr_sample = 0;
 
 	while(1)
 	{	
 		if (ms_counter > 1000)		//on every 1000ms (1sec)
 		{
-			TOGGLE_BIT (PORTC,5);
 			ms_counter = 0;		//reset counter
-			uart_puts(ptr3);	//send string 
+
+			ADC_start_single_conversion();
+			
+			//wait for the ADC to finish
+			while((ADCSRA & (1<<ADSC))){};
+
+			hr_sample = ADCL;
+			hr_sample += (ADCH << 8); 
+			
+			ultoa (hr_sample, hr_spl_srting ,10);
+			
+
+			TOGGLE_BIT (PORTC,5);
+			uart_puts(hr_ptr);	//send string 
+			uart_puts(newline);
 		}
 		sleep_now();	// sleep until timer2 interrupt
 	}
