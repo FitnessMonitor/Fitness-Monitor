@@ -12,7 +12,8 @@
 #define CLEAR_BIT(PORT, BITNUM) ((PORT) &= ~(1<<(BITNUM)))
 #define TOGGLE_BIT(PORT, BITNUM) ((PORT) ^= (1<<(BITNUM)))
 
-volatile uint16_t ms_counter;
+volatile uint16_t ms_counter = 0;
+volatile uint8_t hr_counter = 20;
 
 
 ISR(TIMER2_OVF_vect)	//when timer 2 interrupts
@@ -20,6 +21,7 @@ ISR(TIMER2_OVF_vect)	//when timer 2 interrupts
 	sleep_disable();
 	timer2_1ms_reset();	//reset timer to interrupt in 1ms
 	ms_counter++;
+	hr_counter++;
 }
 
 ISR(ADC_vect)
@@ -45,26 +47,37 @@ int main(void){
 	char hr_spl_srting[5];
 	char *hr_ptr = &hr_spl_srting;
 	char *newline = " \r\n  ";
-	uint16_t hr_sample = 0;
-
+	char *space = " ";
+	uint16_t hr_sample[25];
+	int num = 0;
+	int m;
 	while(1)
 	{	
-		if (ms_counter > 1000)		//on every 1000ms (1sec)
+		if (hr_counter >50)
 		{
-			ms_counter = 0;		//reset counter
-
+			hr_counter = 0;
 			ADC_start_single_conversion();
 			
 			//wait for the ADC to finish
 			while((ADCSRA & (1<<ADSC))){};
 
-			hr_sample = (ADCH); 
+			hr_sample[num] = ADCH; 
+			num++;
+		}
+		else if (ms_counter > 1000)		//on every 1000ms (1sec)
+		{
+			ms_counter = 0;		//reset counter
 			
-			ultoa (hr_sample, hr_spl_srting ,10);
+			for (m = 0; m<20; m++)
+			{
+				ultoa (hr_sample[m], hr_spl_srting ,10);
+				uart_puts(hr_ptr);	//send string 
+				uart_puts(space);
+			}	
+			num = 0;
 			
-
+			
 			TOGGLE_BIT (PORTC,5);
-			uart_puts(hr_ptr);	//send string 
 			uart_puts(newline);
 		}
 		sleep_now();	// sleep until timer2 interrupt
