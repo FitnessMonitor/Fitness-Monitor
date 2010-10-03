@@ -389,7 +389,7 @@ def main():
     parser.add_option("-p", "--port",
         dest = "port",
         help = "port, a number (default 0) or a device name (deprecated option)",
-        default = None
+        default = "dev/ttyUSB0"
     )
 
     parser.add_option("-b", "--baud",

@@ -408,7 +408,7 @@ class Fetch:
 				self.xonxoff
 			)
 		except serial.SerialException, e:
-			sys.stderr.write("could not open port %r: %s\n" % (self.port, e))
+			sys.stderr.write("could not open port %r: %s\n" % (port, e))
 			sys.exit(1)
 
 		miniterm.start()
