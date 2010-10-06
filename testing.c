@@ -1,50 +1,57 @@
 #include <avr/io.h>
 #include <util/delay.h>
-#include "uartUTIL.h"
 #include "adcUTIL.h"
+#include "ledUTIL.h"
+#include "lcdUTIL.h"
 
 char *ptr1 = " hard step ";
 char *ptr2 = " soft step ";
 char *ptr3 = " very soft step ";
+char i;
 
 int main(void)
 {
+	
 	int stepCNT=0;	//count steps taken
-	USARTInit(25);	//UART setup
-	initADC();	// ADC setup 
-	
-	
+	initADC();		//ADC setup 
+	init_LCD();		//LCD setup
 
+	_delay_ms(10);
+
+	data_out(*ptr1);	//output text to LCD
+ 			
 	while(1)
 	{
 		
-		if(ADCH>in1)	//hard step
+		
+		if(ADCH>in1)		//very soft step
 		{
 			stepCNT++;
-			uart_puts(ptr1);
+			pulseLED();
 					
 		}
 
-	
 
 		else if(ADCH>in2)	//soft step
 		{
 			stepCNT++;
-			uart_puts(ptr2);
-					
+			pulseLED();
+			pulseLED();
+				
 		}
 
-		else if(ADCH>in3)	//very soft step
+		else if(ADCH>in3)	//hard step
 		{
 			stepCNT++;
-			uart_puts(ptr3);
+			pulseLED();
+			pulseLED();
+			pulseLED();
 					
 		}
 
-		_delay_ms(50);	//wait a bit 
+		_delay_ms(10);	//wait a bit 
 
 	}
-
 
 return 0;   
 }
