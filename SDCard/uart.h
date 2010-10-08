@@ -1,5 +1,16 @@
-void uart_init(void);         /* Initialize UART */
-uint8_t uart_get (void);      /* Get a byte from UART Rx */
-uint8_t uart_test(void);      /* Check number of data in UART Rx FIFO */
-void uart_put(unsigned char);   /* Transmit a byte*/
-void uart_puts(const char *s);   /* Transmit a string of bytes*/ 
+#ifndef _USART_H_
+#define _USART_H_
+
+#define FOSC 1000000	//clock speed
+#define BAUD 4800
+#define MYUBRR FOSC/16/BAUD-1
+
+void USARTInit(int ubrr_value);
+char USARTReadChar(void);
+void USARTWriteChar(char data);
+void uart_puts(char *s);
+
+#endif //_USART_H_
+
+// eof
+

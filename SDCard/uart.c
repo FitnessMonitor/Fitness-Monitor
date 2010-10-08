@@ -1,60 +1,45 @@
-/*------------------------------------------------*/
-/* UART functions                                 */
-
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include <util/delay.h>
 #include "uart.h"
 
-#define   BAUD      9600
-
-void USART_Transmit( unsigned char txData )
+void USARTInit(int ubrr_value)
 {
-   /* Wait for empty transmit buffer */
-   while ( !( UCSR0A & (1<<UDRE0)) );
-   /* Put data into buffer, sends the data */
-   UDR0 = txData;
+//ubrr=(f_osc/(16*Baud Rate))-1
+//for f_osc = 1Mhz, Baud Rate = 2400, ubrr = 25
+UBRR0H = (ubrr_value>>8);	//shift 8 bits?
+UBRR0L = ubrr_value;  //set baud rate
+// asynchronous mode, no parity, 1 stop bit, 8 bit size
+UCSR0C = (1<<UCSZ01)|(1<<UCSZ00);
+//receive enable, tansmit enable
+UCSR0B = (1<<RXEN0)|(1<<TXEN0);
 }
 
-void USART_set_baud_rate(double baudrate)
-{
-   // calculate division factor for requested baud rate, and set it
-   int bauddiv = ((F_CPU+(baudrate*8L))/(baudrate*16L)-1);
-   UBRR0L= bauddiv;
-#ifdef UBRR0H
-   UBRR0H= (bauddiv>>8);
-#endif
+char USARTReadChar()
+{	
+//	wait until data is available
+//	_delay_ms(1000);		//wait 1 seconds
+	while(!(UCSR0A & (1<<RXC0))) //while 1, loop
+	{	
+		//do nothing
+	}
+
+	return UDR0;
 }
 
-/* Initialize UART */
+void USARTWriteChar(char data)
+{	
+	while(!(UCSR0A & (1<<UDRE0)))	//wait until transmitter is ready
+	{
+		//do nothing
+	}
+	UDR0=data;  //write data to USART buffer
+}
 
-void uart_init()
-{
-   UCSR0B = (1<<RXEN0)|(1<<TXEN0);      // Turn on U(S)ART port
-   UCSR0C = (1<<UCSZ01)|(1<<UCSZ00);   // Set frame format: 8 data bits, 1 stop bit, no parity
-   USART_set_baud_rate(BAUD); //Set baud rate
+void uart_puts(char *s) 
+{	
+	while(*s) //  loop until *s != NULL
+	{
+		USARTWriteChar(*s);
+		s++;
+	}
 }
 
 
-/* Get a received character */
-uint8_t uart_get ()
-{
-   unsigned char d;
-   while ((UCSR0A & (1 << RXC0)) == 0) {}; // Do nothing until data have been recieved and is ready to be read from UDR
-   d=UDR0;
-   return d;
-}
-
-/* Transmit a character */
-void uart_put(uint8_t d)
-{
-   
-   USART_Transmit( d );
-}
-
-/* Transmit a string */
-void uart_puts(const char *s)
-{
-   while (*s)
-      USART_Transmit( *s++ );
-} 

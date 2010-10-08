@@ -12,7 +12,7 @@
 int main(void){
 
 	//setup UART
-	USARTInit(MYUBRR);
+	USARTInit(12);
 	
 	char *ptr3 = "Working \r\n ";
 	while(1)
