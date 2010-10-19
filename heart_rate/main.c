@@ -46,14 +46,15 @@ int main(void){
 	
 	char hr_spl_srting[5];
 	char *hr_ptr = &hr_spl_srting;
-	char *newline = " \r\n  ";
+	char *newline = "\r\n";
 	char *space = " ";
-	uint16_t hr_sample[25];
-	int num = 0;
-	int m;
+	char *comma = ",";
+	uint16_t hr_sample[1500];
+	uint16_t num = 0;
+	uint16_t m;
 	while(1)
 	{	
-		if (hr_counter >50)
+		if (hr_counter >100)
 		{
 			hr_counter = 0;
 			ADC_start_single_conversion();
@@ -62,23 +63,23 @@ int main(void){
 			while((ADCSRA & (1<<ADSC))){};
 
 			hr_sample[num] = ADCH; 
+			if (hr_sample[num]> 80) SET_BIT(PORTC,5);
+			else CLEAR_BIT(PORTC,5);
 			num++;
 		}
-		else if (ms_counter > 1000)		//on every 1000ms (1sec)
+		else if (ms_counter > 10000)		//on every 1000ms (1sec)
 		{
 			ms_counter = 0;		//reset counter
 			
-			for (m = 0; m<20; m++)
+			for (m = 0; m<num; m++)
 			{
 				ultoa (hr_sample[m], hr_spl_srting ,10);
 				uart_puts(hr_ptr);	//send string 
-				uart_puts(space);
+				uart_puts(comma);
 			}	
-			num = 0;
-			
-			
-			TOGGLE_BIT (PORTC,5);
 			uart_puts(newline);
+			
+			if (num == 3000) num = 0;
 		}
 		sleep_now();	// sleep until timer2 interrupt
 	}
