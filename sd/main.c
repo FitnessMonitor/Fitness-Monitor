@@ -46,12 +46,25 @@ int main (void)
 		PORTC |= (1<<PC2);
 	}
 
-	if (Stat & STA_NODISK) {
+	FIL logFile;
+	//works
+	if(f_open(&logFile, "/dancole.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
+		//flag error
+
+	}
+
+	//Close and unmount. 
+	f_close(&logFile);
+
+	f_mount(0,0);
+
+	if (driveStatus & STA_NOINIT) {
 		PORTC |= (1<<PC3);
 	}
 	else {
 		while(1) {
 			PORTC ^= (1<<PC3);
+			_delay_ms(100);
 		}
 	}
 /*
