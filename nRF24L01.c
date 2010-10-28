@@ -11,6 +11,10 @@
 // Flag which denotes transmitting mode
 volatile uint8_t PTX;
 
+uint8_t nRF24L01_data[32];
+uint8_t *buffer =  &nRF24L01_data[0];
+uint8_t buffersize = sizeof(nRF24L01_data);
+
 void nRF24L01_init() 
 // Initializes pins ans interrupt to communicate with the nRF24L01 module
 // Should be called in the early initializing phase at startup.
@@ -184,11 +188,8 @@ void nRF24L01_send(uint8_t * value, uint8_t len)
 // Sends a data package to the default address. Be sure to send the correct
 // amount of bytes as configured as payload on the receiver.
 {
-	while (PTX) {}				// Wait until last paket is send
-
 	nRF24L01_CE_lo;
 
-	PTX = 1;				// Set to transmitter mode
 	TX_POWERUP;				// Power up
     
 	nRF24L01_CSN_lo;			// Pull down chip select

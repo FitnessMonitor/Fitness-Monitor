@@ -104,8 +104,8 @@ extern void nRF24L01_set_TADDR(uint8_t * adr);
 extern void nRF24L01_interrupt ();
 extern uint8_t nRF24L01_data_ready();
 extern void nRF24L01_get_data(uint8_t * data);
-extern void nRF24L01_RX_powerup()
-extern void nRF24L01_powerdown()
+extern void nRF24L01_RX_powerup();
+extern void nRF24L01_powerdown();
 
 // Public extended functions
 extern void nRF24L01_config_register(uint8_t reg, uint8_t value);

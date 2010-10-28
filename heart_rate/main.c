@@ -1,7 +1,9 @@
-#define F_CPU 1000000UL /* 8 MHz Internal Oscillator */
+#define F_CPU 1000000UL /* 1 MHz Internal Oscillator */
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdlib.h>
+#include "../nRF24L01.c"
+#include "../spi.c"
 #include "../sleep.c"
 #include "../rtc.c"
 #include "../uart.c"
@@ -14,7 +16,7 @@
 
 volatile uint16_t ms_counter = 0;
 volatile uint8_t hr_counter = 20;
-
+volatile uint8_t transmit_counter = 0;
 
 ISR(TIMER2_OVF_vect)	//when timer 2 interrupts
 {			//wake up from sleeping
@@ -30,13 +32,26 @@ ISR(ADC_vect)
 }
 
 
+ISR( PCINT2_vect ) 
+{
+	nRF24L01_interrupt ();
+}
+
 int main(void){
 	
 	//initialize ports
 	DDRC |= 1<<PC5;
 
+	// Initialize AVR for use with nRF24L01
+	nRF24L01_init();
+	// Wait for nRF24L01 to come up
+	_delay_ms(50);
+
 	//initialize timer 2 to interrupt ever 1ms
 	timer2_1ms_setup();
+
+	// Configure nRF24L01
+	nRF24L01_config();
 
 	//setup UART
 	USARTInit(MYUBRR);
@@ -45,16 +60,17 @@ int main(void){
 	ADC_init(ADC0);
 	
 	char hr_spl_srting[5];
-	char *hr_ptr = &hr_spl_srting;
+	char *hr_ptr = &hr_spl_srting[0];
 	char *newline = "\r\n";
-	char *space = " ";
+	//char *space = " ";
 	char *comma = ",";
 	uint16_t hr_sample[1500];
 	uint16_t num = 0;
 	uint16_t m;
+	nRF24L01_data[0] = 0x02;
 	while(1)
 	{	
-		if (hr_counter >100)
+		if (0)
 		{
 			hr_counter = 0;
 			ADC_start_single_conversion();
@@ -65,21 +81,23 @@ int main(void){
 			hr_sample[num] = ADCH; 
 			if (hr_sample[num]> 80) SET_BIT(PORTC,5);
 			else CLEAR_BIT(PORTC,5);
-			num++;
+			//num++;
+
 		}
-		else if (ms_counter > 10000)		//on every 1000ms (1sec)
+		else if (ms_counter > 1000)		//on every 1000ms (1sec)
 		{
 			ms_counter = 0;		//reset counter
-			
-			for (m = 0; m<num; m++)
+
+			if (nRF24L01_data[0] == 0x01)
 			{
-				ultoa (hr_sample[m], hr_spl_srting ,10);
-				uart_puts(hr_ptr);	//send string 
-				uart_puts(comma);
+				nRF24L01_data[0] = 0x02;
 			}	
-			uart_puts(newline);
-			
-			if (num == 3000) num = 0;
+			else
+			{
+				nRF24L01_data[0] = 0x01;
+			}
+			nRF24L01_send(buffer,1);	
+
 		}
 		sleep_now();	// sleep until timer2 interrupt
 	}
