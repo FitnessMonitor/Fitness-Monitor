@@ -192,9 +192,9 @@ void nRF24L01_send(uint8_t * value, uint8_t len)
 
 	TX_POWERUP;				// Power up
     
-	nRF24L01_CSN_lo;			// Pull down chip select
-	spi_transmit_byte( FLUSH_TX );		// Write cmd to flush tx fifo
-	nRF24L01_CSN_hi;			// Pull up chip select
+	//nRF24L01_CSN_lo;			// Pull down chip select
+	//spi_transmit_byte( FLUSH_TX );		// Write cmd to flush tx fifo
+	//nRF24L01_CSN_hi;			// Pull up chip select
     
 	nRF24L01_CSN_lo;			// Pull down chip select
 	spi_transmit_byte( W_TX_PAYLOAD );	// Write cmd to write payload

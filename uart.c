@@ -14,22 +14,13 @@ UCSR0B = (1<<RXEN0)|(1<<TXEN0);
 
 char USARTReadChar()
 {	
-//	wait until data is available
-//	_delay_ms(1000);		//wait 1 seconds
-	while(!(UCSR0A & (1<<RXC0))) //while 1, loop
-	{	
-		//do nothing
-	}
-
+	while(!(UCSR0A & (1<<RXC0))){} //wait for data
 	return UDR0;
 }
 
 void USARTWriteChar(char data)
 {	
-	while(!(UCSR0A & (1<<UDRE0)))	//wait until transmitter is ready
-	{
-		//do nothing
-	}
+	while(!(UCSR0A & (1<<UDRE0))){};//wait until transmitter is ready
 	UDR0=data;  //write data to USART buffer
 }
 
