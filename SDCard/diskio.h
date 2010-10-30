@@ -76,3 +76,4 @@ DRESULT disk_ioctl (BYTE, BYTE, void*);
 
 #define _DISKIO
 #endif
+
