@@ -11,6 +11,7 @@
 #include <util/delay.h>
 #include "ff.c"
 #include "diskio.c"
+#include "uart.c"
 
 ISR(TIMER0_COMPA_vect) {  /* should be called every 10ms */
   disk_timerproc();
@@ -34,7 +35,12 @@ static void IoInit ()
 
 int main (void)
 {
+	char *ptr3 = "Working \r\n ";
+	UINT s1;
+	BYTE Buff[1024];
+	BYTE res;
 
+	USARTInit(103);
 	IoInit();
 	FATFS FileSystemObject;
 
@@ -46,23 +52,35 @@ int main (void)
 	}
 
 	FIL logFile;
-	//works
+
 	if(f_open(&logFile, "/20101023.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
 		//flag error
 
 	}
 
+/*
+	res = f_read (
+		&logFile,	// Pointer to the file object structure
+		Buff,		// Pointer to the buffer to store read data
+		sizeof(Buff),	// Number of bytes to read
+		&s1		//Pointer to the variable to return number of bytes read
+	);
+*/
+
+	//works
+	/*
 	unsigned int bytesWritten;
 	f_write(&logFile, "123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n", 100, &bytesWritten);
 
 	f_write(&logFile, "987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n", 100, &bytesWritten);
 	//Flush the write buffer with f_sync(&logFile);
 
+	*/
+
 	//Close and unmount. 
 	f_close(&logFile);
 
-	f_mount(0,0);
-
+/*
 	if (driveStatus & STA_NOINIT) {
 		PORTC |= (1<<PC3);
 	}
@@ -71,6 +89,11 @@ int main (void)
 			PORTC ^= (1<<PC3);
 			_delay_ms(100);
 		}
+	}
+*/
+	while(1) {	
+		uart_puts(ptr3);
+		_delay_ms(1000);	
 	}
 /*
 	//_delay_ms(1000);
