@@ -35,17 +35,23 @@ static void IoInit ()
 
 int main (void)
 {
+	char *ptr1 = "No SD Card \r\n";
+	char *ptr2 = "Started \r\n ";
 	char *ptr3 = "Working \r\n ";
+	char dan;
 	UINT s1;
-	BYTE Buff[1024];
+	char BuffArr[100];
+	char *Buff = &BuffArr[0];
 	BYTE res;
 
 	USARTInit(103);
 	IoInit();
 	FATFS FileSystemObject;
 
-	DSTATUS driveStatus = disk_initialize(0);
+	uart_puts(ptr2);
+	_delay_ms(1000);
 
+	DSTATUS driveStatus = disk_initialize(0);
 
 	if(f_mount(0, &FileSystemObject)!=FR_OK) {
 		PORTC |= (1<<PC2);
@@ -55,27 +61,35 @@ int main (void)
 
 	if(f_open(&logFile, "/20101023.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
 		//flag error
-
+		uart_puts(ptr1);
+		_delay_ms(1000);
 	}
 
-/*
-	res = f_read (
-		&logFile,	// Pointer to the file object structure
-		Buff,		// Pointer to the buffer to store read data
-		sizeof(Buff),	// Number of bytes to read
-		&s1		//Pointer to the variable to return number of bytes read
-	);
-*/
+	// sizeof(Buff)
 
+	if(f_read (&logFile, Buff, 100, &s1) != FR_OK) {
+		while(1) {
+			PORTC ^= (1<<PC3);
+			_delay_ms(100);
+		}
+	}
+	uart_puts(Buff);
+	_delay_ms(1000);
+/*
+	while(1) {
+		PORTC ^= (1<<PC3);
+		_delay_ms(100);
+	}
+*/
 	//works
-	/*
+	
 	unsigned int bytesWritten;
 	f_write(&logFile, "123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n", 100, &bytesWritten);
 
 	f_write(&logFile, "987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n", 100, &bytesWritten);
 	//Flush the write buffer with f_sync(&logFile);
 
-	*/
+	
 
 	//Close and unmount. 
 	f_close(&logFile);

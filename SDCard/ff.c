@@ -2142,7 +2142,6 @@ FRESULT f_read (
 	UINT rcnt, cc;
 	BYTE csect, *rbuff = buff;
 
-
 	*br = 0;	/* Initialize byte counter */
 
 	res = validate(fp->fs, fp->id);					/* Check validity of the object */
