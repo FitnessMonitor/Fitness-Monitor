@@ -34,6 +34,22 @@ ISR( PCINT2_vect )
 	nRF24L01_interrupt ();
 }
 
+void u8_to_a ( uint8_t number, char * s )
+{
+	uint8_t div10 = number / 10;
+	uint8_t div100 = div10/10;
+	*s = div100 + 48;
+	s++;
+	*s = div10 - 10*div100 + 48;
+	s++;
+	*s = number - 10*div10 + 48;
+	s++;
+	*s = 10; //0x0A; 
+	s++;
+	*s = 13; //0x0D; 
+	s++;
+	*s = 0;	
+}
 
 int main(void){
 	
@@ -56,15 +72,19 @@ int main(void){
 
 	//initialize ADC
 	ADC_init(ADC0);
-	char charstring[] = "abcdefg   "; 
+
+
+	char charstring[30]; 
 	char *ptr = &charstring[0];
+	char newline[] = "\n";
 	uint16_t hr_sample[150];
 	uint8_t hr_index = 0;
-	uint8_t bpm[10] = {50, 50, 50, 50, 50, 50, 50, 50, 50, 0};
-	uint8_t bpm_index = 0;
-	uint8_t bpm_avg;
+	//uint8_t bpm[10] = {50, 50, 50, 50, 50, 50, 50, 50, 50, 0};
+	//uint8_t bpm_index = 0;
+	//uint8_t bpm_avg = 0;
 	uint8_t i;
 	nRF24L01_data[0] = 0x02;
+
 	while(1)
 	{	
 		if ((ms_counter % 50)-10 == 0)	//sample the Heart Rate signal every 50ms
@@ -87,41 +107,60 @@ int main(void){
 			uint8_t beat_started = 0;
 			uint8_t beat_count = 0;
 			uint8_t interval = 0;
+			uint8_t firstbeat = 255;
+			uint8_t lastbeat = 0;
+			uint16_t total_time;
+			uint16_t avg_time;
+			uint8_t bpm;
 			//calculate how many beats occured
 			for (i = 0; i< hr_index; i++)
 			{
-				interval++;
-				if ((hr_sample[i] >= 80) && !beat_started && (interval > 1))
+				if ((hr_sample[i] >= 85) && !beat_started)
 				{
+					if (firstbeat == 255)
+					{
+						firstbeat = i;	
+					}
 					beat_count++;
 					interval = 0;
 					beat_started = 1;
+					lastbeat = i;
 				}
-				else if ((hr_sample[i] < 80) && beat_started && (interval > 1))
+				else if ((hr_sample[i] < 80) && beat_started && (interval > 6))
 				{
-					interval = 0;
 					beat_started = 0;
 				}
+				interval++;
 			}
-			hr_index = 0;
+			interval = lastbeat-firstbeat;
+			total_time = interval*50;
+			avg_time =  total_time / (beat_count-1);
+			bpm = 60000/avg_time;
+			//u8_to_a(bpm, &charstring[0]);
 			
-			bpm[bpm_index] = beat_count*10;
-			if (bpm_index < 5) bpm_index++;
-			else bpm_index = 0;
-					
-			bpm_avg = 0;
-			for (i = 0; i<6; i++)
-			{
-				bpm_avg = bpm_avg + bpm[bpm_index];
-			}
-			bpm_avg = bpm_avg / 6;						
-		
+			//uint8_t number = bpm;
+
+			//uint8_t div10 = number / 10;
+			//uint8_t div100 = div10/10;
+			//charstring[0] = div100 + 48;
+			//charstring[1] = div10 - 10*div100 + 48;
+			//charstring[2] = number - 10*div10 + 48;
+			//charstring[3] = 10; //0x0A; 
+			//charstring[4] = 13; //0x0D; 
+			//charstring[5] = 0;
+
+
+			//uart_puts(ptr); 
+			
+			
+								
 		}		
 		
-		if (ms_counter > 1000)		//on every 1000ms (1sec)
+		if (ms_counter > 10000)		//on every 1000ms (1sec)
 		{
 			ms_counter = 0;		//reset counter
-			uart_puts(ptr); 
+			//u8_to_a(115, &charstring[0]);
+			//uart_puts(ptr); 
 			if (nRF24L01_data[0] == 0x01)
 			{
 				nRF24L01_data[0] = 0x02;
