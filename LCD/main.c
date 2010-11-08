@@ -11,7 +11,7 @@
 #include "uart.c"
 
 
-volatile uint8_t buffer[512] ;
+volatile uint8_t buffer[512];
 
 int main(void) {
   char *ptr1 = "Start \r\n";
