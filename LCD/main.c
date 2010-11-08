@@ -1,18 +1,15 @@
 #define F_CPU 8000000UL
 #include <avr/io.h>
 #include <util/delay.h>
-#include "glcd.h"
-#include "glcd.c"
-#include "glcdfont.c"
+#include "lcd.h"
+#include "lcd.c"
+#include "lcdfont.c"
 
+// For (FTDI) USB UART 
 #include <string.h>
 #include <util/delay.h>
 #include "uart.c"
 
-
-//uint8_t is_reversed = 0;
-
-//int pagemap[] = { 3, 2, 1, 0, 7, 6, 5, 4 };
 
 volatile uint8_t buffer[512] ;
 
@@ -23,6 +20,7 @@ int main(void) {
   USARTInit(103);
   uart_puts(ptr1);
   _delay_ms(1000);
+  // Config Settings are in lcd.h
   setup();
   uart_puts(ptr2);
   _delay_ms(1000);
