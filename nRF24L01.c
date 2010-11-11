@@ -26,7 +26,7 @@ void nRF24L01_init()
 
 	// Initialize external interrupt on port PD6 (PCINT22)
 	DDRD &= ~(1<<PD6);
-	PCMSK2 = (1<<PCINT22);
+	PCMSK2 = (1<<PCINT23);
 	PCICR  = (1<<PCIE2);
 
 	// Initialize spi module

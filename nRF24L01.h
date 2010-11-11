@@ -9,8 +9,8 @@
 #define nRF24L01_CONFIG     ( (0<<MASK_RX_DR) | (0<<MASK_TX_DS) | (0<<MASK_MAX_RT) | (1<<EN_CRC) | (0<<CRCO) )
 
 // Pin definitions for chip select and chip enabled of the nRF24L01 module
-#define CE  PB0
-#define CSN PB1
+#define CE  PB1
+#define CSN PB0
 
 // Definitions for selecting and enabling nRF24L01 module
 #define nRF24L01_CSN_hi     PORTB |=  (1<<CSN);

@@ -87,7 +87,7 @@ int main(void){
 
 	while(1)
 	{	
-		if ((ms_counter % 50)-10 == 0)	//sample the Heart Rate signal every 50ms
+	/*	if ((ms_counter % 50)-10 == 0)	//sample the Heart Rate signal every 50ms
 		{
 			ADC_start_single_conversion();
 			
@@ -155,12 +155,12 @@ int main(void){
 			
 								
 		}		
-		
-		if (ms_counter > 10000)		//on every 1000ms (1sec)
-		{
+		*/
+		//if (ms_counter > 1000)		//on every 1000ms (1sec)
+		//{
 			ms_counter = 0;		//reset counter
 			//u8_to_a(115, &charstring[0]);
-			//uart_puts(ptr); 
+			uart_puts(ptr); 
 			if (nRF24L01_data[0] == 0x01)
 			{
 				nRF24L01_data[0] = 0x02;
@@ -170,8 +170,9 @@ int main(void){
 				nRF24L01_data[0] = 0x01;
 			}
 			nRF24L01_send(buffer,1);	
-		}
-		sleep_now();	// sleep until timer2 interrupt
+			_delay_ms(1000);
+		//}
+		//sleep_now();	// sleep until timer2 interrupt
 	}
 
 }
