@@ -85,7 +85,7 @@ int main (void)
 
 	FIL logFile;
 
-	if(f_open(&logFile, "/20101107.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
+	if(f_open(&logFile, "/20101115.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
 		//flag error
 		uart_puts(ptr1);
 		_delay_ms(1000);
