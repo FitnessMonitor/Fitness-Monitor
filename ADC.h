@@ -19,7 +19,8 @@
 #define ADC_interrupt_disable() (ADCSRA &= ~(1<<ADIE))
 #define ADC_start_conversion() (ADCSRA |= (1<<ADSC))
 
-extern void ADC_init();
+extern void ADC_init(int ADC_channel);
+extern void ADC_init_ADC7();
 extern void ADC_start_single_conversion();
 #endif
 
