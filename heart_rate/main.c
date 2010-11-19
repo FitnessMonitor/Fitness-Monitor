@@ -50,16 +50,18 @@ int main(void){
 			hr_index++; //increment index of array
 		}
 
-		if (ms_counter > 9000)	//calculate beats after last sample in 10sec interval
+		if (ms_counter > 9000)	//calculate bpm for this 10sec interval
 		{
 			bpm = calculate_bpm(&hr_sample[0], hr_index-1);					
 		}		
 		
 		if (ms_counter > 10000)		//on every 10000ms (10sec)
 		{
-			ms_counter = 0;		//reset counter
-			nRF24L01_data[0] = bpm;
+			//reset counter
+			ms_counter = 0;
+
 			//Transmit 
+			nRF24L01_data[0] = bpm;
 			nRF24L01_send(buffer,1);	
 		}
 		sleep_now();	// sleep until timer2 interrupt

@@ -1,27 +1,50 @@
-#define F_CPU 1000000UL
-/*----------------------------------------------------------------------*/
-/* FAT file system sample project for FatFs            (C)ChaN, 2010    */
-/*----------------------------------------------------------------------*/
-
+#define F_CPU 1000000UL /* 1 MHz Internal Oscillator */
 #include <avr/io.h>
+#include <util/delay.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include <avr/power.h>
-//#include <string.h>
-#include <util/delay.h>
-#include "ff.c"
-#include "diskio.c"
-#include "uart.c"
+#include <stdlib.h>
+#include "../nRF24L01.c"
+#include "../spi.c"
+#include "../sleep.c"
+#include "../ADC.c"
+#include "../ff.c"
+#include "../diskio.c"
+#include "../uart.c"
+#include "../lcd.c"
+#include "../lcdfont.c"
 
-#include "lcd.h"
-#include "lcd.c"
-#include "lcdfont.c"
 
-uint8_t buffer[512];
+//Macros for setting, clearing and toogleing bits.
+#define SET_BIT(PORT, BITNUM) ((PORT) |= (1<<(BITNUM)))
+#define CLEAR_BIT(PORT, BITNUM) ((PORT) &= ~(1<<(BITNUM)))
+#define TOGGLE_BIT(PORT, BITNUM) ((PORT) ^= (1<<(BITNUM)))
 
-ISR(TIMER0_COMPA_vect) {  /* should be called every 10ms */
+volatile uint16_t ms_counter = 0;
+uint8_t disp_buffer[512];
+
+ISR(TIMER0_COMPA_vect) {  
   disk_timerproc();
 }
+
+ISR(TIMER2_OVF_vect)	//when timer 2 interrupts
+{			//wake up from sleeping
+	sleep_disable();
+	timer2_1ms_reset();	//reset timer to interrupt in 1ms
+	ms_counter++;
+}
+
+ISR(ADC_vect)
+{
+//hr_samples[sample[0]] = ADCH;
+}
+
+ISR( PCINT2_vect ) 
+{
+	nRF24L01_interrupt ();
+}
+
 
 static void IoInit ()
 {
@@ -37,7 +60,9 @@ static void IoInit ()
 	power_timer0_enable();
 
 	sei();
+
 }
+
 
 void setup(void) {
     // turn on backlight
@@ -50,14 +75,48 @@ void setup(void) {
     st7565_command(CMD_DISPLAY_ON);
     st7565_command(CMD_SET_ALLPTS_NORMAL);
     clear_screen();
-    clear_buffer(buffer);
+    clear_buffer(disp_buffer);
 
-    //testdrawchar(buffer);
-    drawstring(buffer, 0, 0, "Dan Cole");
-    drawstring(buffer, 0, 3, "Fitness Monitor");
-    write_buffer(buffer);
-    clear_buffer(buffer);
+    //testdrawchar(disp_buffer);
+    drawstring(disp_buffer, 0, 0, "Dan Cole");
+    drawstring(disp_buffer, 0, 3, "Fitness Monitor");
+    write_buffer(disp_buffer);
+    clear_buffer(disp_buffer);
 }
+
+int main(void){
+	
+	init_secondary_device();
+
+	uint16_t hr_sample[150];
+	uint8_t hr_index = 0;
+	nRF24L01_data[0] = 0x00;
+	uint16_t bpm = 0;
+
+	while(1)
+	{	
+		if (ms_counter % 50)	//sample every 50ms		
+
+		}
+
+		sleep_now();	// sleep until timer2 interrupt
+	}
+}
+
+
+
+
+
+
+
+
+/*
+
+
+
+
+
+
 
 int main (void)
 {
@@ -79,105 +138,43 @@ int main (void)
 	DSTATUS driveStatus = disk_initialize(0);
 	
 	if ((driveStatus & STA_NODISK) || (driveStatus & STA_NOINIT)){
-   		drawstring(buffer, 0, 0, "ERROR");
-   		write_buffer(buffer);	
+   		drawstring(disp_buffer, 0, 0, "ERROR");
+   		write_buffer(disp_buffer);	
 	}
 	else{
 		if(f_mount(0, &FileSystemObject)!=FR_OK) {
 			//PORTC |= (1<<PC2);
-	    		drawstring(buffer, 0, 0, "ERROR");
-	   		write_buffer(buffer);
+	    		drawstring(disp_buffer, 0, 0, "ERROR");
+	   		write_buffer(disp_buffer);
 		}
 		else{
-			drawstring(buffer, 0, 1, "Mounted");
-	   		write_buffer(buffer);
+			drawstring(disp_buffer, 0, 1, "Mounted");
+	   		write_buffer(disp_buffer);
 		}
-
-
 		FIL logFile;
-
-
-
 		if(f_open(&logFile, "/20101117.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
-			drawstring(buffer, 0, 2, "File not created");
-	   		write_buffer(buffer);
+			drawstring(disp_buffer, 0, 2, "File not created");
+	   		write_buffer(disp_buffer);
 		}
 		else{
-			drawstring(buffer, 0, 2, "File created");
-	   		write_buffer(buffer);
+			drawstring(disp_buffer, 0, 2, "File created");
+	   		write_buffer(disp_buffer);
 			unsigned int bytesWritten;
 			f_write(&logFile, "123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n", 100, &bytesWritten);
 			f_write(&logFile, "987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n", 100, &bytesWritten);
-			drawstring(buffer, 0, 3, "File Written");
-	   		write_buffer(buffer);
+			drawstring(disp_buffer, 0, 3, "File Written");
+	   		write_buffer(disp_buffer);
 			//Close and unmount. 
 			f_close(&logFile);
 		}
 	}
-	// sizeof(Buff)
-/*
-	if(f_read (&logFile, Buff, 100, &s1) != FR_OK) {
-		while(1) {
-			PORTC ^= (1<<PC3);
-			_delay_ms(100);
-		}
-	}
-	uart_puts(Buff);
-	_delay_ms(1000);
-*/
-/*
-	while(1) {
-		PORTC ^= (1<<PC3);
-		_delay_ms(100);
-	}
-*/
-	//works
-
-
-	
-
-	//Flush the write buffer with f_sync(&logFile);
-
-
-
-
-
-/*
-	if (driveStatus & STA_NOINIT) {
-		PORTC |= (1<<PC3);
-	}
-	else {
-		while(1) {
-			PORTC ^= (1<<PC3);
-			_delay_ms(100);
-		}
-	}
-*/
-    	drawstring(buffer, 0, 4, "Done");
-   	write_buffer(buffer);
-
+    	drawstring(disp_buffer, 0, 4, "Done");
+   	write_buffer(disp_buffer);
 	while(1) {	
 		uart_puts(ptr3);
 		_delay_ms(1000);	
 	}
-/*
-	//_delay_ms(1000);
 
-	DSTATUS driveStatus = disk_initialize(0);
-
-	FIL logFile;
-	//works
-	if(f_open(&logFile, "/dancole.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
-		//flag error
-	}
-
-	unsigned int bytesWritten;
-	f_write(&logFile, "New log opened!\n", 16, &bytesWritten);
-	//Flush the write buffer with f_sync(&logFile);
-
-	//Close and unmount. 
-	f_close(&logFile);
-	f_mount(0,0);
-*/
 }
+*/
 
