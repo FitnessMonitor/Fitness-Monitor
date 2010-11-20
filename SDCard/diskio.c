@@ -16,10 +16,10 @@
 #define DD_SS   2
 
 /* Defines for SD card SPI access */
-#define SD_CS_PIN   1
-#define SD_CS_PORT   PORTC
-#define SD_PWR_PIN   0
-#define SD_PWR_PORT   PORTC 
+#define SD_CS_PIN   6
+#define SD_CS_PORT   PORTD
+#define SD_CS_DDR  DDRD
+
 
 #define SELECT()      SD_CS_PORT &= ~(1<<SD_CS_PIN)      /* MMC CS = L */
 #define DESELECT()   SD_CS_PORT |=  (1<<SD_CS_PIN)      /* MMC CS = H */ 
@@ -178,7 +178,7 @@ void power_on (void)
    SD_PWR_PORT|=(1<<SD_PWR_PIN);   // Drives PWR pin high
 #endif
 
-   DDRC|=(1<<SD_CS_PIN);          // Turns on CS pin as output
+   SD_CS_DDR|=(1<<SD_CS_PIN);          // Turns on CS pin as output
    DDR_SPI = (1<<DD_MOSI)|(1<<DD_SCK)| (1<<DD_SS);
    SPCR = (1<<SPE)|(1<<MSTR); /* Initialize SPI port (Mode 0) */
 } 
@@ -340,7 +340,8 @@ DSTATUS disk_initialize (
 
 	ty = 0;
 	if (send_cmd(CMD0, 0) == 1) {			/* Enter Idle state */
-		Timer1 = 100;						/* Initialization timeout of 1000 msec */
+		Timer1 = 100;
+						//Initialization timeout of 1000 msec 
 		if (send_cmd(CMD8, 0x1AA) == 1) {	/* SDv2? */
 			for (n = 0; n < 4; n++) ocr[n] = rcvr_spi();		/* Get trailing return value of R7 resp */
 			if (ocr[2] == 0x01 && ocr[3] == 0xAA) {				/* The card can work at vdd range of 2.7-3.6V */
