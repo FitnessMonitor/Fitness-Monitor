@@ -23,7 +23,7 @@ ISR(TIMER0_COMPA_vect) {  /* should be called every 10ms */
 static void IoInit ()
 {
 	PORTB = 0b10110000; 	// Port B
-	DDRB  = 0b00000000;
+	DDRB  = 0b00110000;
 
 	TIMSK0 |= 1 << OCIE0A;  //enable interrupt for timer match a 
 	OCR0A = 78;  // 10 ms interrupt at 8MHz
@@ -49,29 +49,34 @@ void setup(void) {
 
 int main (void)
 {
-	_delay_ms(1000);
+	_delay_ms(500);
 	USARTInit(12);
 	IoInit();
 	setup();
 	FATFS FileSystemObject;
 
-	_delay_ms(100);
-
 	DSTATUS driveStatus = disk_initialize(0);
 
+	DDRB |= 1 << PB4;
 	if(f_mount(0, &FileSystemObject)!=FR_OK) {
 		// flag error
-		_delay_ms(100);
+		drawstring(buffer, 0, 0, "Error Mounting Filesystem");
+		write_buffer(buffer);
 	}
-
-	drawstring(buffer, 0, 0, "Mount Filesystem");
-	write_buffer(buffer);
+	else {
+		drawstring(buffer, 0, 0, "Filesystem Mounted");
+		write_buffer(buffer);
+	}
 
 	FIL logFile;
 
+	f_open(&logFile, "/20101119.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS);
+	_delay_ms(500);
+
 	if(f_open(&logFile, "/20101119.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
 		//flag error
-		_delay_ms(200);
+		drawstring(buffer, 0, 1, "Could Not Open File");
+		write_buffer(buffer);
 	}
 	else {
 		drawstring(buffer, 0, 1, "Opened File");
