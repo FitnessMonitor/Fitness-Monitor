@@ -20,7 +20,7 @@ void init_secondary_device (void)
 	//USARTInit(MYUBRR);
 
 	//initialize ADC
-	ADC_init(ADC0);
+	init_ADC0();
 }
 
 uint8_t get_hr_sample(void)
