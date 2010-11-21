@@ -22,8 +22,9 @@ ISR(TIMER0_COMPA_vect) {  /* should be called every 10ms */
 
 static void IoInit ()
 {
-	PORTB = 0b10110000; 	// Port B
-	DDRB  = 0b00110000;
+	PORTB = 0b00010101;
+//	PORTB = 0b10110000; 	// Port B
+	DDRB  = 0b00000000;
 
 	TIMSK0 |= 1 << OCIE0A;  //enable interrupt for timer match a 
 	OCR0A = 78;  // 10 ms interrupt at 8MHz
