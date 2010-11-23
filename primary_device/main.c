@@ -1,4 +1,4 @@
-#define F_CPU 1000000UL /* 1 MHz Internal Oscillator */
+#define F_CPU 8000000UL /* 1 MHz Internal Oscillator */
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/pgmspace.h>
@@ -65,39 +65,92 @@ static void IoInit ()
 
 
 void setup(void) {
-    // turn on backlight
-    BLA_DDR |= _BV(BLA);
-    BLA_PORT |= _BV(BLA);
+	// turn on backlight
+	BLA_DDR |= _BV(BLA);
+	BLA_PORT |= _BV(BLA);
 
-    LED_DDR |= _BV(LED);
-	IoInit();
+	LED_DDR |= _BV(LED);
+	//IoInit();
 	
-    st7565_init();
-    st7565_command(CMD_DISPLAY_ON);
-    st7565_command(CMD_SET_ALLPTS_NORMAL);
-    clear_screen();
-    clear_buffer(disp_buffer);
+	st7565_init();
+	st7565_command(CMD_DISPLAY_ON);
+	st7565_command(CMD_SET_ALLPTS_NORMAL);
+	clear_screen();
+	clear_buffer(disp_buffer);
 
-    //testdrawchar(disp_buffer);
-    drawstring(disp_buffer, 0, 3, "Fitness Monitor");
-    write_buffer(disp_buffer);
-    clear_buffer(disp_buffer);
+	//testdrawchar(disp_buffer);
+	drawstring(disp_buffer, 0, 3, "Fitness Monitor");
+	write_buffer(disp_buffer);
+	clear_buffer(disp_buffer);
 }
 
 int main(void){
 	
 	setup();
+	uint8_t line = 0;
 
+	//initialize timer 2 to interrupt ever 1ms
+	timer2_1ms_setup();
 	while(1)
 	{	
 		if (ms_counter % 50)	//sample every 50ms		
 		{
 			
 		}
-		if (ms_counter == 10000) //every 10 seconds
+		if (ms_counter == 1000) //every 10 seconds
 		{
 			ms_counter = 0; //reset counter
+			line ++;
+			if (line == 4) line = 0;
+			clear_screen();
+			drawstring(disp_buffer, 0, line, "test");
+			write_buffer(disp_buffer);
+		/*	FATFS FileSystemObject;
 
+
+
+			DSTATUS driveStatus = disk_initialize(0);
+	
+
+			if ((driveStatus & STA_NODISK) || (driveStatus & STA_NOINIT)){
+		   		drawstring(disp_buffer, 0, 0, "ERROR");
+		   		write_buffer(disp_buffer);	
+			}
+			else{
+
+				if(f_mount(0, &FileSystemObject)!=FR_OK) {
+					//PORTC |= (1<<PC2);
+			    		drawstring(disp_buffer, 0, 0, "ERROR");
+			   		write_buffer(disp_buffer);
+
+				}
+				else{
+					drawstring(disp_buffer, 0, 1, "Mounted");
+			   		write_buffer(disp_buffer);
+
+				}
+				FIL logFile;
+				if(f_open(&logFile, "/20101117.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
+					drawstring(disp_buffer, 0, 2, "File not created");
+
+			   		write_buffer(disp_buffer);
+				}
+				else{
+					drawstring(disp_buffer, 0, 2, "File created");
+
+			   		write_buffer(disp_buffer);
+					unsigned int bytesWritten;
+					f_write(&logFile, "123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n", 100, &bytesWritten);
+					f_write(&logFile, "987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n", 100, &bytesWritten);
+
+					drawstring(disp_buffer, 0, 3, "File Written");
+			   		write_buffer(disp_buffer);
+					//Close and unmount. 
+					f_close(&logFile);
+
+				}
+			}
+		*/
 		}
 
 		sleep_now();	// sleep until timer2 interrupt
@@ -111,71 +164,10 @@ int main(void){
 
 
 
-/*
 
 
 
 
 
 
-
-int main (void)
-{
-	char *ptr1 = "No SD Card \r\n";
-	char *ptr2 = "Started \r\n ";
-	char *ptr3 = "Working \r\n ";
-	char dan;
-	UINT s1;
-	char BuffArr[100];
-	char *Buff = &BuffArr[0];
-	BYTE res;
-
-	USARTInit(12);
-	IoInit();
-	setup();
-	FATFS FileSystemObject;
-
-
-	DSTATUS driveStatus = disk_initialize(0);
-	
-	if ((driveStatus & STA_NODISK) || (driveStatus & STA_NOINIT)){
-   		drawstring(disp_buffer, 0, 0, "ERROR");
-   		write_buffer(disp_buffer);	
-	}
-	else{
-		if(f_mount(0, &FileSystemObject)!=FR_OK) {
-			//PORTC |= (1<<PC2);
-	    		drawstring(disp_buffer, 0, 0, "ERROR");
-	   		write_buffer(disp_buffer);
-		}
-		else{
-			drawstring(disp_buffer, 0, 1, "Mounted");
-	   		write_buffer(disp_buffer);
-		}
-		FIL logFile;
-		if(f_open(&logFile, "/20101117.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
-			drawstring(disp_buffer, 0, 2, "File not created");
-	   		write_buffer(disp_buffer);
-		}
-		else{
-			drawstring(disp_buffer, 0, 2, "File created");
-	   		write_buffer(disp_buffer);
-			unsigned int bytesWritten;
-			f_write(&logFile, "123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n", 100, &bytesWritten);
-			f_write(&logFile, "987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n987654321\n", 100, &bytesWritten);
-			drawstring(disp_buffer, 0, 3, "File Written");
-	   		write_buffer(disp_buffer);
-			//Close and unmount. 
-			f_close(&logFile);
-		}
-	}
-    	drawstring(disp_buffer, 0, 4, "Done");
-   	write_buffer(disp_buffer);
-	while(1) {	
-		uart_puts(ptr3);
-		_delay_ms(1000);	
-	}
-
-}
-*/
 
