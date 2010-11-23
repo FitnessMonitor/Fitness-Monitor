@@ -1,7 +1,5 @@
 #include <avr/interrupt.h>
 
-<<<<<<< HEAD
-=======
 #define ADC0 0x00
 #define ADC1 0x01
 #define ADC2 0x02
@@ -12,7 +10,6 @@
 #define ADC7 0x07
 #define ADC8 0x08
 
->>>>>>> 5793541bd196650923ae10c25b167ddf9128cc26
 #ifndef _ADC_Header_
 #define _ADC_Header_
 
@@ -22,11 +19,10 @@
 #define ADC_interrupt_disable() (ADCSRA &= ~(1<<ADIE))
 #define ADC_start_conversion() (ADCSRA |= (1<<ADSC))
 
-extern void ADC_init(int ADC_channel);
+extern void ADC_init();
+extern void init_ADC0();
+extern void init_ADC1();
+extern void init_ADC7();
 extern void ADC_start_single_conversion();
-<<<<<<< HEAD
-extern void ADC_shutdown();
-=======
->>>>>>> 5793541bd196650923ae10c25b167ddf9128cc26
 #endif
 
