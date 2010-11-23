@@ -9,8 +9,13 @@
 #define nRF24L01_CONFIG     ( (0<<MASK_RX_DR) | (0<<MASK_TX_DS) | (0<<MASK_MAX_RT) | (1<<EN_CRC) | (0<<CRCO) )
 
 // Pin definitions for chip select and chip enabled of the nRF24L01 module
+<<<<<<< HEAD
 #define CE  PB0
 #define CSN PB1
+=======
+#define CE  PB1
+#define CSN PB0
+>>>>>>> 5793541bd196650923ae10c25b167ddf9128cc26
 
 // Definitions for selecting and enabling nRF24L01 module
 #define nRF24L01_CSN_hi     PORTB |=  (1<<CSN);
@@ -104,8 +109,13 @@ extern void nRF24L01_set_TADDR(uint8_t * adr);
 extern void nRF24L01_interrupt ();
 extern uint8_t nRF24L01_data_ready();
 extern void nRF24L01_get_data(uint8_t * data);
+<<<<<<< HEAD
 extern void nRF24L01_RX_powerup()
 extern void nRF24L01_powerdown()
+=======
+extern void nRF24L01_RX_powerup();
+extern void nRF24L01_powerdown();
+>>>>>>> 5793541bd196650923ae10c25b167ddf9128cc26
 
 // Public extended functions
 extern void nRF24L01_config_register(uint8_t reg, uint8_t value);

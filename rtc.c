@@ -8,7 +8,11 @@ extern void timer2_1ms_setup()
 #if F_CPU == 1000000UL
 	TCCR2B  |= _BV(CS21);	// prescaler of 8
 #elif F_CPU == 8000000UL
+<<<<<<< HEAD
 	TCCR2B  |= _BV(CS21);	// prescaler of 64
+=======
+	TCCR2B  |= _BV(CS22);	// prescaler of 64
+>>>>>>> 5793541bd196650923ae10c25b167ddf9128cc26
 #else
 #error F_CPU not defined
 #endif
@@ -40,7 +44,10 @@ extern void RTC_get_dhms (volatile uint32_t * RTC_count, int16_t * days, int8_t 
 	*seconds = s;
 
 }
+<<<<<<< HEAD
 //4294967296
+=======
+>>>>>>> 5793541bd196650923ae10c25b167ddf9128cc26
 
 extern void RTC_set_dhms (volatile uint32_t * RTC_count, int16_t days, int8_t hours, int8_t minutes, int8_t seconds)
 {

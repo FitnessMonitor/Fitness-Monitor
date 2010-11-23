@@ -11,6 +11,13 @@
 // Flag which denotes transmitting mode
 volatile uint8_t PTX;
 
+<<<<<<< HEAD
+=======
+uint8_t nRF24L01_data[32];
+uint8_t *buffer =  &nRF24L01_data[0];
+uint8_t buffersize = sizeof(nRF24L01_data);
+
+>>>>>>> 5793541bd196650923ae10c25b167ddf9128cc26
 void nRF24L01_init() 
 // Initializes pins ans interrupt to communicate with the nRF24L01 module
 // Should be called in the early initializing phase at startup.
@@ -22,7 +29,11 @@ void nRF24L01_init()
 
 	// Initialize external interrupt on port PD6 (PCINT22)
 	DDRD &= ~(1<<PD6);
+<<<<<<< HEAD
 	PCMSK2 = (1<<PCINT22);
+=======
+	PCMSK2 = (1<<PCINT23);
+>>>>>>> 5793541bd196650923ae10c25b167ddf9128cc26
 	PCICR  = (1<<PCIE2);
 
 	// Initialize spi module
@@ -184,6 +195,7 @@ void nRF24L01_send(uint8_t * value, uint8_t len)
 // Sends a data package to the default address. Be sure to send the correct
 // amount of bytes as configured as payload on the receiver.
 {
+<<<<<<< HEAD
 	while (PTX) {}				// Wait until last paket is send
 
 	nRF24L01_CE_lo;
@@ -194,6 +206,15 @@ void nRF24L01_send(uint8_t * value, uint8_t len)
 	nRF24L01_CSN_lo;			// Pull down chip select
 	spi_transmit_byte( FLUSH_TX );		// Write cmd to flush tx fifo
 	nRF24L01_CSN_hi;			// Pull up chip select
+=======
+	nRF24L01_CE_lo;
+
+	TX_POWERUP;				// Power up
+    
+	//nRF24L01_CSN_lo;			// Pull down chip select
+	//spi_transmit_byte( FLUSH_TX );		// Write cmd to flush tx fifo
+	//nRF24L01_CSN_hi;			// Pull up chip select
+>>>>>>> 5793541bd196650923ae10c25b167ddf9128cc26
     
 	nRF24L01_CSN_lo;			// Pull down chip select
 	spi_transmit_byte( W_TX_PAYLOAD );	// Write cmd to write payload

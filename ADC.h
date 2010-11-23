@@ -1,5 +1,18 @@
 #include <avr/interrupt.h>
 
+<<<<<<< HEAD
+=======
+#define ADC0 0x00
+#define ADC1 0x01
+#define ADC2 0x02
+#define ADC3 0x03
+#define ADC4 0x04
+#define ADC5 0x05
+#define ADC6 0x06
+#define ADC7 0x07
+#define ADC8 0x08
+
+>>>>>>> 5793541bd196650923ae10c25b167ddf9128cc26
 #ifndef _ADC_Header_
 #define _ADC_Header_
 
@@ -11,6 +24,9 @@
 
 extern void ADC_init(int ADC_channel);
 extern void ADC_start_single_conversion();
+<<<<<<< HEAD
 extern void ADC_shutdown();
+=======
+>>>>>>> 5793541bd196650923ae10c25b167ddf9128cc26
 #endif
 
