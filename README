@@ -1,24 +1,40 @@
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 5793541bd196650923ae10c25b167ddf9128cc26
-README FILE FOR Sr. Design
+Project: Fitness Monitor
+Authors: Dan Cole, Charles Wolf, and Norm Haas
 
-This is charles' branch of the sr design project.  
-the majority of the code here will be for the secondary device (heart rate monitor)
-<<<<<<< HEAD
-=======
-=======
->>>>>>> master
-This is the working branch for Dan Cole.
 
-You can use the submit.git script by using the command:		sh ./submit.git your message with spaces
+Liecense:
+	A two device project that measures steps and heart rate, then records then for later analysis
+	Copyright (C) 2010 Dan Cole & Charles Wolf
 
-Onus is a Python computer program for Linux.
-<<<<<<< HEAD
-=======
->>>>>>> dancole
->>>>>>> master
->>>>>>> 5793541bd196650923ae10c25b167ddf9128cc26
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+About:
+	There are two devices. The primary device and the secondary device (Heart Rate Monitor).
+
+	Primary Device:
+		Accelerometer
+		SD Card
+		ATmega 328p
+		USB Port through FTDI chip
+		Recharging circuit for LIPO battery
+		2.4GHz nRF24L01+ Wireless Circuit
+
+	Secondary Device (Heart Rate Monitor):
+		Hear Rate Circuit
+		ATmega 328p
+		USB Port through FTDI chip
+		Recharging circuit for LIP battery
+		2.4GHz nRF24L01+ Wireless Circuit
+
