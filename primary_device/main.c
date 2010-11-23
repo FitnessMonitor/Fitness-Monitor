@@ -1,17 +1,16 @@
 #define F_CPU 8000000UL /* 1 MHz Internal Oscillator */
 #include <avr/io.h>
 #include <util/delay.h>
-#include <avr/pgmspace.h>
+//#include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include <avr/power.h>
-#include <stdlib.h>
-#include "../nRF24L01.c"
+//#include <stdlib.h>
+//#include "../nRF24L01.c"
 #include "../spi.c"
 #include "../sleep.c"
 #include "../ADC.c"
 #include "../ff.c"
 #include "../diskio.c"
-#include "../uart.c"
 #include "../lcd.c"
 #include "../lcdfont.c"
 
@@ -25,7 +24,7 @@ volatile uint16_t ms_counter = 0;
 uint8_t disp_buffer[512];
 
 ISR(TIMER0_COMPA_vect) {  
-  disk_timerproc();
+//  disk_timerproc();
 }
 
 ISR(TIMER2_OVF_vect)	//when timer 2 interrupts
@@ -42,7 +41,7 @@ ISR(ADC_vect)
 
 ISR( PCINT2_vect ) 
 {
-	nRF24L01_interrupt ();
+//	nRF24L01_interrupt ();
 }
 
 
@@ -102,10 +101,10 @@ int main(void){
 			ms_counter = 0; //reset counter
 			line ++;
 			if (line == 4) line = 0;
-			clear_screen();
+			clear_buffer(disp_buffer);
 			drawstring(disp_buffer, 0, line, "test");
 			write_buffer(disp_buffer);
-		/*	FATFS FileSystemObject;
+			FATFS FileSystemObject;
 
 
 
@@ -150,7 +149,7 @@ int main(void){
 
 				}
 			}
-		*/
+		
 		}
 
 		sleep_now();	// sleep until timer2 interrupt
