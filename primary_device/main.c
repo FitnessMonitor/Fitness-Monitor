@@ -70,7 +70,8 @@ void setup(void) {
     BLA_PORT |= _BV(BLA);
 
     LED_DDR |= _BV(LED);
-
+	IoInit();
+	
     st7565_init();
     st7565_command(CMD_DISPLAY_ON);
     st7565_command(CMD_SET_ALLPTS_NORMAL);
@@ -78,7 +79,6 @@ void setup(void) {
     clear_buffer(disp_buffer);
 
     //testdrawchar(disp_buffer);
-    drawstring(disp_buffer, 0, 0, "Dan Cole");
     drawstring(disp_buffer, 0, 3, "Fitness Monitor");
     write_buffer(disp_buffer);
     clear_buffer(disp_buffer);
@@ -86,16 +86,17 @@ void setup(void) {
 
 int main(void){
 	
-	init_secondary_device();
-
-	uint16_t hr_sample[150];
-	uint8_t hr_index = 0;
-	nRF24L01_data[0] = 0x00;
-	uint16_t bpm = 0;
+	setup();
 
 	while(1)
 	{	
 		if (ms_counter % 50)	//sample every 50ms		
+		{
+			
+		}
+		if (ms_counter == 10000) //every 10 seconds
+		{
+			ms_counter = 0; //reset counter
 
 		}
 
