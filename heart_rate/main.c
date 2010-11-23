@@ -2,16 +2,11 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdlib.h>
-#include "../nRF24L01.c"
-#include "../spi.c"
-#include "../sleep.c"
-#include "../ADC.c"
-#include "../heart_rate.c"
-
-//Macros for setting, clearing and toogleing bits.
-#define SET_BIT(PORT, BITNUM) ((PORT) |= (1<<(BITNUM)))
-#define CLEAR_BIT(PORT, BITNUM) ((PORT) &= ~(1<<(BITNUM)))
-#define TOGGLE_BIT(PORT, BITNUM) ((PORT) ^= (1<<(BITNUM)))
+#include "../lib/nRF24L01.c"
+#include "../lib/spi.c"
+#include "../lib/sleep.c"
+#include "../lib/ADC.c"
+#include "heart_rate.c"
 
 volatile uint16_t ms_counter = 0;
 
