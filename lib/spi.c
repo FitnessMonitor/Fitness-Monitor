@@ -18,11 +18,7 @@ void spi_init()
             (0<<SPIE)|              // SPI Interupt Enable
             (0<<DORD)|              // Data Order (0:MSB first / 1:LSB first)
             (1<<MSTR)|              // Master/Slave select   
-<<<<<<< HEAD
-            (1<<SPR1)|(1<<SPR0)|    // SPI Clock Rate
-=======
             (0<<SPR1)|(1<<SPR0)|    // SPI Clock Rate
->>>>>>> 5793541bd196650923ae10c25b167ddf9128cc26
             (0<<CPOL)|              // Clock Polarity (0:SCK low / 1:SCK hi when idle)
             (0<<CPHA));             // Clock Phase (0:leading / 1:trailing edge sampling)
 
