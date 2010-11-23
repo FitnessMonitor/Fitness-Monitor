@@ -22,8 +22,12 @@ ISR(TIMER0_COMPA_vect) {  /* should be called every 10ms */
 
 static void IoInit ()
 {
+<<<<<<< HEAD
 	PORTB = 0b00010101;
 //	PORTB = 0b10110000; 	// Port B
+=======
+	PORTB = 0b10110000; 	// Port B
+>>>>>>> parent of d3c2d09... PCB SD Card Problem
 	DDRB  = 0b00000000;
 
 	TIMSK0 |= 1 << OCIE0A;  //enable interrupt for timer match a 
@@ -50,34 +54,29 @@ void setup(void) {
 
 int main (void)
 {
-	_delay_ms(500);
+	_delay_ms(1000);
 	USARTInit(12);
 	IoInit();
 	setup();
 	FATFS FileSystemObject;
 
+	_delay_ms(100);
+
 	DSTATUS driveStatus = disk_initialize(0);
 
-	DDRB |= 1 << PB4;
 	if(f_mount(0, &FileSystemObject)!=FR_OK) {
 		// flag error
-		drawstring(buffer, 0, 0, "Error Mounting Filesystem");
-		write_buffer(buffer);
+		_delay_ms(100);
 	}
-	else {
-		drawstring(buffer, 0, 0, "Filesystem Mounted");
-		write_buffer(buffer);
-	}
+
+	drawstring(buffer, 0, 0, "Mount Filesystem");
+	write_buffer(buffer);
 
 	FIL logFile;
 
-	f_open(&logFile, "/20101119.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS);
-	_delay_ms(500);
-
 	if(f_open(&logFile, "/20101119.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
 		//flag error
-		drawstring(buffer, 0, 1, "Could Not Open File");
-		write_buffer(buffer);
+		_delay_ms(200);
 	}
 	else {
 		drawstring(buffer, 0, 1, "Opened File");

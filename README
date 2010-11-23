@@ -1,5 +1,18 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+README FILE FOR Sr. Design
+
+This is charles' branch of the sr design project.  
+the majority of the code here will be for the secondary device (heart rate monitor)
+=======
+>>>>>>> master
 This is the working branch for Dan Cole.
 
 You can use the submit.git script by using the command:		sh ./submit.git your message with spaces
 
 Onus is a Python computer program for Linux.
+<<<<<<< HEAD
+=======
+>>>>>>> dancole
+>>>>>>> master
