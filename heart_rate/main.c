@@ -28,7 +28,8 @@ ISR( PCINT2_vect )
 	nRF24L01_interrupt ();
 }
 
-int main(void){
+int main(void)
+{
 	
 	init_secondary_device();
 
@@ -62,33 +63,4 @@ int main(void){
 		sleep_now();	// sleep until timer2 interrupt
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
