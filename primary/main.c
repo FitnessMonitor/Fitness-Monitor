@@ -6,7 +6,7 @@
 #include <avr/power.h>
 //#include <stdlib.h>
 //#include "../lib/nRF24L01.c"
-#include "../lib/spi.c"
+//#include "../lib/spi.c"
 #include "../lib/sleep.c"
 #include "../lib/ADC.c"
 #include "../lib/ff.c"
@@ -94,10 +94,11 @@ int main(void){
 	{	
 		if (ms_counter % 50)	//sample every 50ms		
 		{
-			
+			//sample the ADC and store result somewhere	
 		}
-		if (ms_counter == 1000) //every 10 seconds
+		if (ms_counter == 10000) //every 10 seconds
 		{
+				
 			ms_counter = 0; //reset counter
 			line ++;
 			if (line == 4) line = 0;
