@@ -48,11 +48,12 @@ extern void ADC_shutdown()
 
 uint8_t get_sample(uint8_t ADC_val)
 {
-	switch (ADC_val)
-	case: 0 init_ADC0();
-	case: 1 init_ADC1();
-	case: 7 init_ADC7();
-	default: init_ADC0();
+	switch (ADC_val){
+		case 0 : init_ADC0();
+		case 1 : init_ADC1();
+		case 7 : init_ADC7();
+		default : init_ADC0();
+	}
 
 	//start the conversion
 	ADC_start_single_conversion();

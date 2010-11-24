@@ -14,7 +14,7 @@
 #include "../lib/lcd.c"
 #include "../lib/lcdfont.c"
 
-volatile uint16_t ms_counter = 0;
+volatile uint32_t ms_counter = 0;
 uint8_t disp_buffer[512];
 
 #include "primary.c"
@@ -70,22 +70,13 @@ void setup(void) {
 	clear_buffer(disp_buffer);
 }
 
-void init_accelerometer(void) {
-	ADC_init(ADC0);
-	//ADC_init(ADC1);
-	//ADC_init(ADC7);
-}
-
-uint8_t get_accelerometer_sample(void) {
-	ADC_start_single_conversion();
-	while((ADCSRA & (1<<ADSC))){};
-	return ADCH;
-}
 
 int main(void){
 	uint8_t accel_buffer[32];
 	int avg;
 	int i;
+	uint8_t index = 0;
+	uint8_t samples [100];
 	setup();
 	uint8_t line = 0;
 
@@ -95,9 +86,23 @@ int main(void){
 	{	
 		if (ms_counter % 50)	//sample every 50ms		
 		{
-			//sample the ADC and store result somewhere	
-		}
-		if (ms_counter == 1000) //every 10 seconds
+			avg = 0;
+			index++;
+			if (index == 100) index = 0;
+			samples[index] = get_sample(0);			
+			for (i = 0; i<100; i++) {
+			avg += samples[i];
+			}
+			avg = avg/100;
+			i2s(avg, accel_buffer);
+			clear_buffer( disp_buffer );
+			drawstring( disp_buffer, 0, 1, "The Accelerometer" );
+			drawstring( disp_buffer, 0, 3, "X-axis: " );
+			drawstring( disp_buffer, 45, 3, accel_buffer );
+			write_buffer(disp_buffer);
+
+		}	
+ 		if (ms_counter == 600000) //every 10 min
 		{
 				
 			ms_counter = 0; //reset counter
@@ -109,19 +114,6 @@ int main(void){
 			FATFS FileSystemObject;
 		
 		}
-		init_accelerometer();
-
-		avg = 0;
-		for (i = 0; i<100; i++) {
-			avg += get_accelerometer_sample();
-			_delay_ms(50);
-		}
-		avg = avg/100;
-		i2s(avg, accel_buffer);
-		drawstring( disp_buffer, 0, 1, "The Accelerometer" );
-		drawstring( disp_buffer, 0, 3, "X-axis: " );
-		drawstring( disp_buffer, 45, 3, accel_buffer );
-		write_buffer(disp_buffer);
 
 		sleep_now();	// sleep until timer2 interrupt
 	}
