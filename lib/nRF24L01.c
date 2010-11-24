@@ -102,6 +102,7 @@ extern void nRF24L01_interrupt ()
 		nRF24L01_powerdown();
 	}
 
+
         // Reset status register for further interaction
         nRF24L01_config_register(STATUS,( (1<<RX_DR) | (1<<TX_DS) | (1<<MAX_RT) ) ); // Reset status register
 
