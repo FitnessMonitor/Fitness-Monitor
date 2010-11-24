@@ -11,10 +11,12 @@ try:
   	import gtk.glade
 except:
 	sys.exit(1)
-
-
-
-
+import matplotlib   
+matplotlib.use('GTK')   
+from matplotlib.figure import Figure   
+from matplotlib.axes import Subplot
+from matplotlib.backends.backend_gtk import FigureCanvasGTK, NavigationToolbar   
+from matplotlib.numerix import arange, sin, pi   
 
 import sys, os, serial, threading
 
@@ -414,8 +416,8 @@ class Fetch:
 		miniterm.start()
 		miniterm.join(True)
 		#miniterm.join()
-
-
+        
+        
 # Core Routine
 #
 # Defines initial variables and conditions
@@ -423,6 +425,18 @@ class Onus:
 	def __init__(self):
 		self.gladefile = "onus.glade"  
 		self.wTree = gtk.glade.XML(self.gladefile, "mainWindow")
+		
+		self.figure = Figure(figsize=(6,4), dpi=72) 
+		self.axis = self.figure.add_subplot(111) 
+		self.axis.set_xlabel('Yepper') 
+		self.axis.set_ylabel('Flabber') 
+		self.axis.set_title('An Empty Graph') 
+		self.axis.grid(True)
+		self.axis.plot([1,2,3,4,5,6,7,8,9,10], [63,63,63,87,70,63,84,87,75,50])
+		self.canvas = FigureCanvasGTK(self.figure) # a gtk.DrawingArea 
+		self.canvas.show() 
+		self.graphview = self.wTree.get_widget("vbox2") 
+		self.graphview.pack_start(self.canvas, True, True)
 		
 		#Create our dictionay and connect it
 		dic = {"on_mainWindow_destroy" : gtk.main_quit
