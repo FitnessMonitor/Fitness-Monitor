@@ -45,7 +45,6 @@ extern void ADC_shutdown()
 	ADC_disable();
 }
 
-
 uint8_t get_sample(uint8_t ADC_val)
 {
 	switch (ADC_val)
@@ -63,8 +62,4 @@ uint8_t get_sample(uint8_t ADC_val)
 	//return the ADC result
 	return ADCH; 
 }
-
-
-
-
 
