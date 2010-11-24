@@ -4,9 +4,9 @@
 //#include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include <avr/power.h>
-//#include <stdlib.h>
-//#include "../lib/nRF24L01.c"
-//#include "../lib/spi.c"
+#include <stdlib.h>
+#include "../lib/nRF24L01.c"
+#include "../lib/spi.c"
 #include "../lib/sleep.c"
 #include "../lib/ADC.c"
 #include "../lib/ff.c"
@@ -14,18 +14,8 @@
 #include "../lib/lcd.c"
 #include "../lib/lcdfont.c"
 
-
-//Macros for setting, clearing and toogleing bits.
-#define SET_BIT(PORT, BITNUM) ((PORT) |= (1<<(BITNUM)))
-#define CLEAR_BIT(PORT, BITNUM) ((PORT) &= ~(1<<(BITNUM)))
-#define TOGGLE_BIT(PORT, BITNUM) ((PORT) ^= (1<<(BITNUM)))
-
 volatile uint16_t ms_counter = 0;
 uint8_t disp_buffer[512];
-
-ISR(TIMER0_COMPA_vect) {  
-//  disk_timerproc();
-}
 
 ISR(TIMER2_OVF_vect)	//when timer 2 interrupts
 {			//wake up from sleeping
@@ -41,7 +31,7 @@ ISR(ADC_vect)
 
 ISR( PCINT2_vect ) 
 {
-//	nRF24L01_interrupt ();
+	nRF24L01_interrupt ();
 }
 
 
@@ -52,11 +42,6 @@ static void IoInit ()
 
 	DDRC |= 1<<PC3;
 	DDRC |= 1<<PC2;
-
-	TIMSK0 |= 1 << OCIE0A;  //enable interrupt for timer match a 
-	OCR0A = 78;  // 10 ms interrupt at 8MHz
-	TCCR0B |= (1 << CS02) | (1 << CS00);  //speed = F_CPU/1024
-	power_timer0_enable();
 
 	sei();
 
@@ -69,7 +54,7 @@ void setup(void) {
 	BLA_PORT |= _BV(BLA);
 
 	LED_DDR |= _BV(LED);
-	//IoInit();
+	IoInit();
 	
 	st7565_init();
 	st7565_command(CMD_DISPLAY_ON);
@@ -96,7 +81,7 @@ int main(void){
 		{
 			//sample the ADC and store result somewhere	
 		}
-		if (ms_counter == 10000) //every 10 seconds
+		if (ms_counter == 1000) //every 10 seconds
 		{
 				
 			ms_counter = 0; //reset counter
