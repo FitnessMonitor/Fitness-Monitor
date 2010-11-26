@@ -117,18 +117,23 @@ int main(void)
 	{	
 		if (ms_counter % 50)	// sample every 50ms		
 		{
-			xaxis[accel_index++] = get_adc_sample(0);
+			unsigned int bytesWritten;
+			uint8_t sample;
+			char sdcard_text[6];
+			sample = get_adc_sample(0);
+			xaxis[accel_index++] = sample;
+			sprintf( sdcard_text, "%d\n", (int) sample );
+			f_write(&logFile, sdcard_text, 6, &bytesWritten);
 		}
 		if (ms_counter % 1000) // every 1 seconds
 		{
 			accel_index = 0;
-			unsigned int bytesWritten;
-			f_write(&logFile, "This is a test of time.\n", 24, &bytesWritten);
-			seconds += 1;
+			//unsigned int bytesWritten;
+			//f_write(&logFile, "This is a test of time.\n", 24, &bytesWritten);
 			sprintf( display_seconds, "%d seconds", (int) seconds );
-			//i2s((int)seconds, display_seconds);
 			drawstring( disp_buffer, 0, 0, display_seconds );
 			write_buffer(disp_buffer);
+			seconds += 1;
 		}
 		if (seconds == 60) // every 1 minute
 		{
