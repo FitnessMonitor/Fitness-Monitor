@@ -1,4 +1,4 @@
-#define F_CPU 8000000UL /* 8 MHz Internal Oscillator */
+#define F_CPU 1000000UL /* 8 MHz Internal Oscillator */
 #include <avr/io.h>
 #include <util/delay.h>
 //#include <avr/pgmspace.h>
@@ -106,10 +106,11 @@ int main(void)
 	uint8_t hours = 0;
 	uint8_t accel_index = 0;
 	uint8_t xaxis [100];
+	char display_seconds[10];
 
 	setup();
-	init_sdcard();
-	sdcard_open(minutes);
+	//init_sdcard();
+	//sdcard_open(minutes);
 	// initialize timer 2 to interrupt ever 1ms
 	timer2_1ms_setup();
 	while(1)
@@ -118,17 +119,23 @@ int main(void)
 		{
 			xaxis[accel_index++] = get_adc_sample(0);
 		}
-		if (ms_counter == 5000) // every 5 seconds
+		if (ms_counter % 1000) // every 5 seconds
 		{
 			accel_index = 0;
 			unsigned int bytesWritten;
-			f_write(&logFile, xaxis, 100, &bytesWritten);
-			seconds += 5;
+			//f_write(&logFile, xaxis, 100, &bytesWritten);
+			seconds += 1;
+			//sprintf( display_seconds, "%d seconds", 1 );
+			i2s((int)seconds, display_seconds);
+			drawstring( disp_buffer, 0, 0, display_seconds );
+			write_buffer(disp_buffer);
 		}
-		if (ms_counter == 60000) // every 1 minute
+		if (ms_counter % 60000) // every 1 minute
 		{
-			sdcard_close();
-			sdcard_open(&minutes);
+			drawstring( disp_buffer, 0, 1, "1 minute" );
+			write_buffer(disp_buffer);
+			//sdcard_close();
+			//sdcard_open(&minutes);
 		}
  		if (ms_counter == 600000) // every 10 minutes
 		{
@@ -138,6 +145,8 @@ int main(void)
 				hours++;
 				minutes = 0;
 			}
+			drawstring( disp_buffer, 0, 2, "10 minutes" );
+			write_buffer(disp_buffer);
 		}
 
 		sleep_now();	// sleep until timer2 interrupt
