@@ -423,14 +423,15 @@ class Fetch:
 # Defines initial variables and conditions
 class Onus:
 	def __init__(self):
-		self.gladefile = "onus.glade"  
+		#self.gladefile = "onus.glade"
+		self.gladefile = "../onus.glade"
 		self.wTree = gtk.glade.XML(self.gladefile, "mainWindow")
 		
 		self.figure = Figure(figsize=(6,4), dpi=72) 
 		self.axis = self.figure.add_subplot(111) 
-		self.axis.set_xlabel('Yepper') 
-		self.axis.set_ylabel('Flabber') 
-		self.axis.set_title('An Empty Graph') 
+		self.axis.set_xlabel('Time (minutes)') 
+		self.axis.set_ylabel('Heart Rate (bpm)') 
+		self.axis.set_title('Activity') 
 		self.axis.grid(True)
 		self.axis.plot([1,2,3,4,5,6,7,8,9,10], [63,63,63,87,70,63,84,87,75,50])
 		self.canvas = FigureCanvasGTK(self.figure) # a gtk.DrawingArea 
@@ -439,16 +440,21 @@ class Onus:
 		self.graphview.pack_start(self.canvas, True, True)
 		
 		#Create our dictionay and connect it
-		dic = {"on_mainWindow_destroy" : gtk.main_quit
-				, "on_connect" : self.on_connect}
+		dic = { "on_mainWindow_destroy" : gtk.main_quit, "on_connect" : self.on_connect, "on_import" : self.on_import }
 		self.wTree.signal_autoconnect(dic)
 
 
 	def on_connect(self, widget):
-		dan = Fetch()
+		#dan = Fetch()
 		#.start()
 		self.statusbar1 = self.wTree.get_widget("statusbar1")
 		self.statusbar1.push(0, "Connected")
+
+	def on_import(self, widget):
+		
+		self.statusbar1 = self.wTree.get_widget("statusbar1")
+		self.statusbar1.push(0, "Importing")
+
 
 # Execute Main Program
 #

@@ -5,6 +5,7 @@
 #include <avr/interrupt.h>
 #include <avr/power.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "../lib/nRF24L01.c"
 #include "../lib/spi.c"
 #include "../lib/sleep.c"
@@ -16,6 +17,8 @@
 
 volatile uint32_t ms_counter = 0;
 uint8_t disp_buffer[512];
+FATFS FileSystemObject;
+FIL logFile;
 
 #include "primary.c"
 
@@ -70,66 +73,75 @@ void setup(void) {
 	clear_buffer(disp_buffer);
 }
 
+void init_sdcard(void)
+{
+	DSTATUS driveStatus = disk_initialize(0);
 
-int main(void){
-	uint8_t accel_buffer[32];
-	int avg;
-	int i;
-	uint8_t index = 0;
-	uint8_t samples [100];
+	if(f_mount(0, &FileSystemObject)!=FR_OK) {
+		//flag error
+		drawstring( disp_buffer, 0, 1, "File System Mounting Error" );
+		write_buffer(disp_buffer);
+	}
+}
+
+void sdcard_open(uint8_t *name)
+{
+	char file_name[16];
+	sprintf( file_name, "/%n.txt", (int *) name );
+	if(f_open(&logFile, file_name, FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
+		//flag error
+		drawstring( disp_buffer, 0, 1, "f_open Error" );
+		write_buffer(disp_buffer);
+	}
+}
+void sdcard_close()
+{
+	f_close(&logFile);
+}
+
+int main(void)
+{
+	uint8_t seconds = 0;
+	uint8_t minutes = 0;
+	uint8_t hours = 0;
+	uint8_t accel_index = 0;
+	uint8_t xaxis [100];
+
 	setup();
-	uint8_t line = 0;
-
-	//initialize timer 2 to interrupt ever 1ms
+	init_sdcard();
+	sdcard_open(minutes);
+	// initialize timer 2 to interrupt ever 1ms
 	timer2_1ms_setup();
 	while(1)
 	{	
-		if (ms_counter % 50)	//sample every 50ms		
+		if (ms_counter % 50)	// sample every 50ms		
 		{
-			avg = 0;
-			index++;
-			if (index == 100) index = 0;
-			samples[index] = get_sample(0);			
-			for (i = 0; i<100; i++) {
-			avg += samples[i];
+			xaxis[accel_index++] = get_adc_sample(0);
+		}
+		if (ms_counter == 5000) // every 5 seconds
+		{
+			accel_index = 0;
+			unsigned int bytesWritten;
+			f_write(&logFile, xaxis, 100, &bytesWritten);
+			seconds += 5;
+		}
+		if (ms_counter == 60000) // every 1 minute
+		{
+			sdcard_close();
+			sdcard_open(&minutes);
+		}
+ 		if (ms_counter == 600000) // every 10 minutes
+		{
+			ms_counter = 0; // reset counter
+			if (minutes == 60)
+			{
+				hours++;
+				minutes = 0;
 			}
-			avg = avg/100;
-			i2s(avg, accel_buffer);
-			clear_buffer( disp_buffer );
-			drawstring( disp_buffer, 0, 1, "The Accelerometer" );
-			drawstring( disp_buffer, 0, 3, "X-axis: " );
-			drawstring( disp_buffer, 45, 3, accel_buffer );
-			write_buffer(disp_buffer);
-
-		}	
- 		if (ms_counter == 600000) //every 10 min
-		{
-				
-			ms_counter = 0; //reset counter
-			line ++;
-			if (line == 4) line = 0;
-			clear_buffer(disp_buffer);
-			drawstring(disp_buffer, 0, line, "test");
-			write_buffer(disp_buffer);
-			FATFS FileSystemObject;
-		
 		}
 
 		sleep_now();	// sleep until timer2 interrupt
 	}
+	f_mount(0,0);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

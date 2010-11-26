@@ -193,13 +193,6 @@ void power_off (void)
    Stat |= STA_NOINIT;      /* Set STA_NOINIT */
 }
 
-static
-int chk_power(void)      /* Socket power state: 0=off, 1=on */
-{
-   return 1;
-}
-
-
 /*-----------------------------------------------------------------------*/
 /* Receive a data packet from MMC                                        */
 /*-----------------------------------------------------------------------*/

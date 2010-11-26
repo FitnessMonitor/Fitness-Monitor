@@ -1,0 +1,16 @@
+year: 2010
+month: 11
+day: 25
+hour: 4
+
+#format: 'minute'\t'heart rate'\t'number of steps'
+0	60	40
+1	62	35
+2	65	10
+3	70	100
+4	80	150
+5	150	200
+6	200	204
+7	200	198
+8	210	180
+

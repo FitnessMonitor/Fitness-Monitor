@@ -45,7 +45,7 @@ extern void ADC_shutdown()
 	ADC_disable();
 }
 
-uint8_t get_sample(uint8_t ADC_val)
+uint8_t get_adc_sample(uint8_t ADC_val)
 {
 	switch (ADC_val){
 		case 0 : init_ADC0();
