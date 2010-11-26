@@ -88,7 +88,7 @@ void sdcard_open(uint8_t *name)
 {
 	char file_name[16];
 	sprintf( file_name, "/%n.txt", (int *) name );
-	if(f_open(&logFile, file_name, FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
+	if(f_open(&logFile, "20101126.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
 		//flag error
 		drawstring( disp_buffer, 0, 1, "f_open Error" );
 		write_buffer(disp_buffer);
@@ -109,8 +109,8 @@ int main(void)
 	char display_seconds[10];
 
 	setup();
-	//init_sdcard();
-	//sdcard_open(minutes);
+	init_sdcard();
+	sdcard_open(minutes);
 	// initialize timer 2 to interrupt ever 1ms
 	timer2_1ms_setup();
 	while(1)
@@ -119,25 +119,25 @@ int main(void)
 		{
 			xaxis[accel_index++] = get_adc_sample(0);
 		}
-		if (ms_counter % 1000) // every 5 seconds
+		if (ms_counter % 1000) // every 1 seconds
 		{
 			accel_index = 0;
 			unsigned int bytesWritten;
-			//f_write(&logFile, xaxis, 100, &bytesWritten);
+			f_write(&logFile, "This is a test of time.\n", 24, &bytesWritten);
 			seconds += 1;
-			//sprintf( display_seconds, "%d seconds", 1 );
-			i2s((int)seconds, display_seconds);
+			sprintf( display_seconds, "%d seconds", (int) seconds );
+			//i2s((int)seconds, display_seconds);
 			drawstring( disp_buffer, 0, 0, display_seconds );
 			write_buffer(disp_buffer);
 		}
-		if (ms_counter % 60000) // every 1 minute
+		if (seconds == 60) // every 1 minute
 		{
 			drawstring( disp_buffer, 0, 1, "1 minute" );
 			write_buffer(disp_buffer);
-			//sdcard_close();
+			sdcard_close();
 			//sdcard_open(&minutes);
 		}
- 		if (ms_counter == 600000) // every 10 minutes
+ 		if (minutes % 10) // every 10 minutes
 		{
 			ms_counter = 0; // reset counter
 			if (minutes == 60)
