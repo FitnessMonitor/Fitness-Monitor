@@ -1,4 +1,4 @@
-#define F_CPU 1000000UL /* 8 MHz Internal Oscillator */
+#define F_CPU 8000000UL /* 8 MHz Internal Oscillator */
 #include <avr/io.h>
 #include <util/delay.h>
 //#include <avr/pgmspace.h>
@@ -73,7 +73,7 @@ void setup(void) {
 	clear_buffer(disp_buffer);
 }
 
-void init_sdcard(void)
+int init_sdcard(void)
 {
 	DSTATUS driveStatus = disk_initialize(0);
 
@@ -81,10 +81,12 @@ void init_sdcard(void)
 		//flag error
 		drawstring( disp_buffer, 0, 1, "File System Mounting Error" );
 		write_buffer(disp_buffer);
+		return 1;	
 	}
+	return 0;
 }
 
-void sdcard_open(uint8_t *name)
+int sdcard_open(uint8_t *name)
 {
 	char file_name[16];
 	sprintf( file_name, "/%n.txt", (int *) name );
@@ -92,7 +94,9 @@ void sdcard_open(uint8_t *name)
 		//flag error
 		drawstring( disp_buffer, 0, 1, "f_open Error" );
 		write_buffer(disp_buffer);
+		return 1;
 	}
+	return 0;
 }
 void sdcard_close()
 {
@@ -110,7 +114,7 @@ int main(void)
 
 	setup();
 	init_sdcard();
-	sdcard_open(minutes);
+	sdcard_open(&minutes);
 	// initialize timer 2 to interrupt ever 1ms
 	timer2_1ms_setup();
 	while(1)
@@ -119,7 +123,7 @@ int main(void)
 		{
 			unsigned int bytesWritten;
 			uint8_t sample;
-			char sdcard_text[6];
+			char sdcard_text[6] = "123456";
 			sample = get_adc_sample(0);
 			xaxis[accel_index++] = sample;
 			sprintf( sdcard_text, "%d\n", (int) sample );
@@ -134,13 +138,14 @@ int main(void)
 			drawstring( disp_buffer, 0, 0, display_seconds );
 			write_buffer(disp_buffer);
 			seconds += 1;
-		}
-		if (seconds == 60) // every 1 minute
-		{
-			drawstring( disp_buffer, 0, 1, "1 minute" );
-			write_buffer(disp_buffer);
-			sdcard_close();
-			//sdcard_open(&minutes);
+		
+			if (seconds == 60) // every 1 minute
+			{
+				drawstring( disp_buffer, 0, 1, "1 minute" );
+				write_buffer(disp_buffer);
+				sdcard_close();
+				//sdcard_open(&minutes);
+			}
 		}
  		if (minutes % 10) // every 10 minutes
 		{
