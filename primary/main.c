@@ -111,14 +111,23 @@ void sdcard_close()
 
 int main(void)
 {
+	//variables for keeping track of time
 	uint8_t seconds = 0;
 	uint8_t minutes = 0;
 	uint8_t hours = 0;
+
+	//used for calculating steps
 	uint8_t accel_index = 0;
 	uint8_t xaxis [100];
-	char display_seconds[10];
-	char display_minutes[10];
 
+
+	//arrays to store data between writes
+	uint8_t 	heart_rate[15];
+	uint16_t	steps_delta[15];
+	uint8_t		activity[15];
+	uint8_t		store_index;
+
+	//initialize
 	setup();
 	init_sdcard();
 	sdcard_open(&minutes);
@@ -130,27 +139,30 @@ int main(void)
 		{	
 			//sample the Acceleromiter
 			xaxis[accel_index++] = get_adc_sample(0);
-
 		}
 		if (ms_counter >= 1000) // every 1 seconds
 		{	
 			ms_counter = 0; // reset counter
+			seconds ++;
 			accel_index = 0;
+
 			// do something to process the acceleromiter samples
 
-			sprintf( display_seconds, "%d seconds", (int) seconds );
-			drawstring( disp_buffer, 0, 0, display_seconds );
-			write_buffer(disp_buffer);
-			seconds += 1;
-			if (seconds == 60) // every 1 minute
+			disp_hms(hours, minutes, seconds);
+
+			if (seconds >= 60) // every 1 minute
 			{
-				//store # of steps in an array (array will be written in 10 min
-				//grab heart rate from transciever & store it
-				sprintf( display_minutes, "%d minutes", (int) minutes );
-				drawstring( disp_buffer, 0, 1, display_minutes );
-				write_buffer(disp_buffer);
-				sdcard_close();
-				minutes += 1;
+				//updtae counters
+				seconds = 0;	//reset seconds
+				minutes ++;	//increment minutes
+
+				//store the number of steps since the last minute
+				steps_delta[store_index] = 0;
+
+				//the transciever recives new data every 10 seconds, get the latest one and store it
+				heart_rate[store_index] = nRF24L01_data[0];  
+				store_index++; //increment the index
+
  				if (minutes % 10) // every 10 minutes
 				{	
 					//Write the data to the SD card
@@ -158,16 +170,21 @@ int main(void)
 					{
 						hours++;
 						minutes = 0;
-					}
-					drawstring( disp_buffer, 0, 2, "10 minutes" );
-					write_buffer(disp_buffer);
-				}
-			}
-			
-		}
-
+					} //endif
+				} //endif
+			} //endif	
+		} //endif
 		sleep_now();	// sleep until timer2 interrupt
-	}
-	f_mount(0,0);
+	}//endwhile
 }
+
+
+
+
+
+
+
+
+
+
 
