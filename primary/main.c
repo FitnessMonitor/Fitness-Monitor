@@ -117,6 +117,7 @@ int main(void)
 	uint8_t accel_index = 0;
 	uint8_t xaxis [100];
 	char display_seconds[10];
+	char display_minutes[10];
 
 	setup();
 	init_sdcard();
@@ -126,41 +127,41 @@ int main(void)
 	while(1)
 	{	
 		if (ms_counter % 50)	// sample every 50ms		
-		{
-			unsigned int bytesWritten;
-			uint8_t sample;
-			char sdcard_text[6];
-			sample = get_adc_sample(0);
-			xaxis[accel_index++] = sample;
-			sprintf( &sdcard_text[0], "%d\n", (int) sample);
-			f_write(&logFile, sdcard_text, 6, &bytesWritten);
+		{	
+			//sample the Acceleromiter
+			xaxis[accel_index++] = get_adc_sample(0);
+
 		}
 		if (ms_counter >= 1000) // every 1 seconds
 		{	
 			ms_counter = 0; // reset counter
 			accel_index = 0;
+			// do something to process the acceleromiter samples
+
 			sprintf( display_seconds, "%d seconds", (int) seconds );
 			drawstring( disp_buffer, 0, 0, display_seconds );
 			write_buffer(disp_buffer);
 			seconds += 1;
 			if (seconds == 60) // every 1 minute
 			{
-				drawstring( disp_buffer, 0, 1, "1 minute" );
+				//store # of steps in an array (array will be written in 10 min
+				//grab heart rate from transciever & store it
+				sprintf( display_minutes, "%d minutes", (int) minutes );
+				drawstring( disp_buffer, 0, 1, display_minutes );
 				write_buffer(disp_buffer);
 				sdcard_close();
-				//sdcard_open(&minutes);
-			}
-		
- 			if (minutes % 10) // every 10 minutes
-			{
-				
-				if (minutes == 60)
-				{
-					hours++;
-					minutes = 0;
+				minutes += 1;
+ 				if (minutes % 10) // every 10 minutes
+				{	
+					//Write the data to the SD card
+					if (minutes == 60)
+					{
+						hours++;
+						minutes = 0;
+					}
+					drawstring( disp_buffer, 0, 2, "10 minutes" );
+					write_buffer(disp_buffer);
 				}
-				drawstring( disp_buffer, 0, 2, "10 minutes" );
-				write_buffer(disp_buffer);
 			}
 			
 		}
