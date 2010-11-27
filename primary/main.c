@@ -49,7 +49,6 @@ static void IoInit ()
 	DDRC |= 1<<PC2;
 
 	sei();
-
 }
 
 
@@ -136,17 +135,14 @@ int main(void)
 			sprintf( &sdcard_text[0], "%d\n", (int) sample);
 			f_write(&logFile, sdcard_text, 6, &bytesWritten);
 		}
-		if (ms_counter == 1000) // every 1 seconds
+		if (ms_counter >= 1000) // every 1 seconds
 		{	
 			ms_counter = 0; // reset counter
 			accel_index = 0;
-			//unsigned int bytesWritten;
-			//f_write(&logFile, "This is a test of time.\n", 24, &bytesWritten);
 			sprintf( display_seconds, "%d seconds", (int) seconds );
 			drawstring( disp_buffer, 0, 0, display_seconds );
 			write_buffer(disp_buffer);
 			seconds += 1;
-		
 			if (seconds == 60) // every 1 minute
 			{
 				drawstring( disp_buffer, 0, 1, "1 minute" );
@@ -166,6 +162,7 @@ int main(void)
 				drawstring( disp_buffer, 0, 2, "10 minutes" );
 				write_buffer(disp_buffer);
 			}
+			
 		}
 
 		sleep_now();	// sleep until timer2 interrupt
