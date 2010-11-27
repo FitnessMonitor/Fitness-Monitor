@@ -93,15 +93,18 @@ int main(void)
 				//updtae counters
 				seconds = 0;	//reset seconds
 				minutes ++;	//increment minutes
-	
-				sdcard_close();
+				
+				void sdcard_close();
+
 
 				//store the number of steps since the last minute
-				steps_delta[store_index] = 0;
+				//steps_delta[store_index] = 0;
 
-				//the transciever recives new data every 10 seconds, get the latest one and store it
-				heart_rate[store_index] = nRF24L01_data[0];  
-				store_index++; //increment the index
+				//store the value recieved 
+				//heart_rate[store_index] = nRF24L01_data[0]; 
+				//nRF24L01_RX_powerup(); //turn on reciever to recive next heart_rate package;
+
+				//store_index++; //increment the index
 
  				if (minutes % 10) // every 10 minutes
 				{	
@@ -117,20 +120,3 @@ int main(void)
 		sleep_now();	// sleep until timer2 interrupt
 	}//endwhile
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
