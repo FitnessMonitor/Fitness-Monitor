@@ -39,76 +39,6 @@ ISR( PCINT2_vect )
 	nRF24L01_interrupt ();
 }
 
-
-static void IoInit ()
-{
-	PORTB = 0b10110000; 	// Port B
-	DDRB  = 0b00001000;
-
-	DDRC |= 1<<PC3;
-	DDRC |= 1<<PC2;
-
-	sei();
-}
-
-
-void setup(void) {
-	// turn on backlight
-	BLA_DDR |= _BV(BLA);
-	BLA_PORT |= _BV(BLA);
-
-	LED_DDR |= _BV(LED);
-	IoInit();
-	
-	st7565_init();
-	st7565_command(CMD_DISPLAY_ON);
-	st7565_command(CMD_SET_ALLPTS_NORMAL);
-	clear_screen();
-	clear_buffer(disp_buffer);
-
-	//testdrawchar(disp_buffer);
-	drawstring(disp_buffer, 0, 3, "Fitness Monitor");
-	write_buffer(disp_buffer);
-	clear_buffer(disp_buffer);
-}
-
-int init_sdcard(void)
-{
-	DSTATUS driveStatus = disk_initialize(0);
-	if ((driveStatus & STA_NODISK) || (driveStatus & STA_NOINIT)) //check for initialization errors
-	{
-   		drawstring(disp_buffer, 0, 1, "SD Initialization Error");
-   		write_buffer(disp_buffer);
-		return 1;	//error 1 initialization failed
-	}
-	else{	//dont try mounting if initialization failed
-		if(f_mount(0, &FileSystemObject)!=FR_OK) {
-			//flag error
-			drawstring( disp_buffer, 0, 1, "File System Mounting Error" );
-			write_buffer(disp_buffer);
-			return 2;	//error 2 mounting failed
-		}
-	}
-	return 0; //no errors
-}
-
-int sdcard_open(uint8_t *name)
-{
-	char file_name[16];
-	sprintf( file_name, "/%n.txt", (int *) name );
-	if(f_open(&logFile, "20101127.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
-		//flag error
-		drawstring( disp_buffer, 0, 1, "f_open Error" );
-		write_buffer(disp_buffer);
-		return 1;
-	}
-	return 0;
-}
-void sdcard_close()
-{
-	f_close(&logFile);
-}
-
 int main(void)
 {
 	//variables for keeping track of time
@@ -159,8 +89,10 @@ int main(void)
 				//store the number of steps since the last minute
 				steps_delta[store_index] = 0;
 
-				//the transciever recives new data every 10 seconds, get the latest one and store it
-				heart_rate[store_index] = nRF24L01_data[0];  
+				//store the value recieved 
+				heart_rate[store_index] = nRF24L01_data[0]; 
+				//nRF24L01_RX_powerup(); //turn on reciever to recive next heart_rate package;
+
 				store_index++; //increment the index
 
  				if (minutes % 10) // every 10 minutes
