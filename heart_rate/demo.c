@@ -40,33 +40,16 @@ int main(void)
 
 	while(1)
 	{	
-		/*if ((ms_counter % 50) && (ms_counter >=1000) && (ms_counter <=9000))	//sample the Heart Rate signal every 50ms
+		if ((ms_counter == 50)	//sample the Heart Rate signal every 50ms
 		{
-			hr_sample[hr_index] = get_hr_sample();		
-			hr_index++; //increment index of array
-		}
-
-		if (ms_counter > 9000)	//calculate bpm for this 10sec interval
-		{
-			bpm = calculate_bpm(&hr_sample[0], hr_index-1);					
-		}		
-		
-		if (ms_counter > 10000)		//on every 10000ms (10sec)
-		{
-			//reset counter
+			if (get_hr_sample() >= 80) SET_BIT(PORTD,2);	
+			else CLEAR_BIT(PORTD,2);	
 			ms_counter = 0;
-
-			//Transmit 
-			nRF24L01_data[0] = bpm;
-			nRF24L01_send(buffer,1);	
+		}
+	
 		}
 		sleep_now();	// sleep until timer2 interrupt
-		*/
-			ms_counter = 0;
-			if (nRF24L01_data[0] == 1) nRF24L01_data[0] = 2;
-			else nRF24L01_data[0] = 1;				
-			nRF24L01_send(buffer,1);
-		_delay_ms(1000);
+
 	}
 }
 

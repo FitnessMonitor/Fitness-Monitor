@@ -13,7 +13,9 @@
 #define DD_MOSI   DDB3
 #define DD_SCK   DDB5
 #define DDR_SPI   DDRB
+#ifndef DD_SS
 #define DD_SS   2
+#endif
 
 /* Defines for SD card SPI access */
 #define SD_CS_PIN   6

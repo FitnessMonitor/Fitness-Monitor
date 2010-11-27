@@ -4,7 +4,9 @@
 #define DDR_SPI     DDRB
 #define DD_MISO     DDB4
 #define DD_MOSI     DDB3
+#ifndef DD_SS
 #define DD_SS       DDB2
+#endif
 #define DD_SCK      DDB5
 
 void spi_init() // Initialize pins for spi communication

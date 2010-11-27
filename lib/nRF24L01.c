@@ -24,8 +24,8 @@ void nRF24L01_init()
 	nRF24L01_CE_lo;
 	nRF24L01_CSN_hi;
 
-	// Initialize external interrupt on port PD6 (PCINT22)
-	DDRD &= ~(1<<PD6);
+	// Initialize external interrupt on port PD7 (PCINT23)
+	DDRD &= ~(1<<PD7);
 	PCMSK2 = (1<<PCINT23);
 	PCICR  = (1<<PCIE2);
 
@@ -51,7 +51,7 @@ void nRF24L01_config()
 	nRF24L01_config_register(STATUS,((1<<TX_DS)|(1<<MAX_RT))); 
 
 	// Start receiver 
-	PTX = 0;        	// Start in receiving mode
+	//PTX = 0;        	// Start in receiving mode
 	RX_POWERUP;     	// Power up in receiving mode
 	nRF24L01_CE_hi;		// Listening for pakets
 	//nRF24L01_CE_lo;
