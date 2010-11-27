@@ -1,4 +1,4 @@
-#define F_CPU 8000000UL /* 8 MHz Internal Oscillator */
+#define F_CPU 1000000UL /* 1 MHz Internal Oscillator */
 #include <avr/io.h>
 #include <util/delay.h>
 //#include <avr/pgmspace.h>
@@ -15,7 +15,7 @@
 #include "../lib/lcd.c"
 #include "../lib/lcdfont.c"
 
-volatile uint32_t ms_counter = 0;
+volatile uint16_t ms_counter = 0;
 uint8_t disp_buffer[512];
 FATFS FileSystemObject;
 FIL logFile;
@@ -136,8 +136,9 @@ int main(void)
 			sprintf( &sdcard_text[0], "%d\n", (int) sample);
 			f_write(&logFile, sdcard_text, 6, &bytesWritten);
 		}
-		if (ms_counter % 1000) // every 1 seconds
-		{
+		if (ms_counter == 1000) // every 1 seconds
+		{	
+			ms_counter = 0; // reset counter
 			accel_index = 0;
 			//unsigned int bytesWritten;
 			//f_write(&logFile, "This is a test of time.\n", 24, &bytesWritten);
@@ -153,17 +154,18 @@ int main(void)
 				sdcard_close();
 				//sdcard_open(&minutes);
 			}
-		}
- 		if (minutes % 10) // every 10 minutes
-		{
-			ms_counter = 0; // reset counter
-			if (minutes == 60)
+		
+ 			if (minutes % 10) // every 10 minutes
 			{
-				hours++;
-				minutes = 0;
+				
+				if (minutes == 60)
+				{
+					hours++;
+					minutes = 0;
+				}
+				drawstring( disp_buffer, 0, 2, "10 minutes" );
+				write_buffer(disp_buffer);
 			}
-			drawstring( disp_buffer, 0, 2, "10 minutes" );
-			write_buffer(disp_buffer);
 		}
 
 		sleep_now();	// sleep until timer2 interrupt
