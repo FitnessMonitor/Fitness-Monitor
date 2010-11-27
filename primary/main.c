@@ -76,21 +76,28 @@ void setup(void) {
 int init_sdcard(void)
 {
 	DSTATUS driveStatus = disk_initialize(0);
-
-	if(f_mount(0, &FileSystemObject)!=FR_OK) {
-		//flag error
-		drawstring( disp_buffer, 0, 1, "File System Mounting Error" );
-		write_buffer(disp_buffer);
-		return 1;	
+	if ((driveStatus & STA_NODISK) || (driveStatus & STA_NOINIT)) //check for initialization errors
+	{
+   		drawstring(disp_buffer, 0, 1, "SD Initialization Error");
+   		write_buffer(disp_buffer);
+		return 1;	//error 1 initialization failed
 	}
-	return 0;
+	else{	//dont try mounting if initialization failed
+		if(f_mount(0, &FileSystemObject)!=FR_OK) {
+			//flag error
+			drawstring( disp_buffer, 0, 1, "File System Mounting Error" );
+			write_buffer(disp_buffer);
+			return 2;	//error 2 mounting failed
+		}
+	}
+	return 0; //no errors
 }
 
 int sdcard_open(uint8_t *name)
 {
 	char file_name[16];
 	sprintf( file_name, "/%n.txt", (int *) name );
-	if(f_open(&logFile, "20101126.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
+	if(f_open(&logFile, "20101127.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
 		//flag error
 		drawstring( disp_buffer, 0, 1, "f_open Error" );
 		write_buffer(disp_buffer);
@@ -123,10 +130,10 @@ int main(void)
 		{
 			unsigned int bytesWritten;
 			uint8_t sample;
-			char sdcard_text[6] = "123456";
+			char sdcard_text[6];
 			sample = get_adc_sample(0);
 			xaxis[accel_index++] = sample;
-			sprintf( sdcard_text, "%d\n", (int) sample );
+			sprintf( &sdcard_text[0], "%d\n", (int) sample);
 			f_write(&logFile, sdcard_text, 6, &bytesWritten);
 		}
 		if (ms_counter % 1000) // every 1 seconds
