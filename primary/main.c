@@ -130,13 +130,17 @@ int main(void)
 		{
 			unsigned int bytesWritten;
 			uint8_t sample;
-			char sdcard_text[6];
+			char sample_text[6];
 			sample = get_adc_sample(0);
 			xaxis[accel_index++] = sample;
-			sprintf( &sdcard_text[0], "%d\n", (int) sample);
-			f_write(&logFile, sdcard_text, 6, &bytesWritten);
+			//i2s((int)sample, sample_text);
+			sprintf( sample_text, "%d\n", (int) sample );
+			char *sdcard_text = sample_text[0];
+			//itoa((int)sample, sample_text, 10);
+			//sprintf( &sdcard_text[0], "%s\n", sample_text);
+			f_write(&logFile, sample_text, 6, &bytesWritten);
 		}
-		if (ms_counter == 1000) // every 1 seconds
+		if (ms_counter >= 1000) // every 1 seconds
 		{	
 			ms_counter = 0; // reset counter
 			accel_index = 0;
@@ -146,7 +150,7 @@ int main(void)
 			drawstring( disp_buffer, 0, 0, display_seconds );
 			write_buffer(disp_buffer);
 			seconds += 1;
-		
+
 			if (seconds == 60) // every 1 minute
 			{
 				drawstring( disp_buffer, 0, 1, "1 minute" );
@@ -157,7 +161,6 @@ int main(void)
 		
  			if (minutes % 10) // every 10 minutes
 			{
-				
 				if (minutes == 60)
 				{
 					hours++;
