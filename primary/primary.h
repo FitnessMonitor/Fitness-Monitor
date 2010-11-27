@@ -6,6 +6,8 @@
 #define CLEAR_BIT(PORT, BITNUM) ((PORT) &= ~(1<<(BITNUM)))
 #define TOGGLE_BIT(PORT, BITNUM) ((PORT) ^= (1<<(BITNUM)))
 
+#define backlight_on PORTC |= 1<<PC2
+#define backlight_off PORTC &= ~(1<<PC2)
 
 static void IoInit ();
 void setup(); 
@@ -15,7 +17,7 @@ int init_sdcard(void);
 int sdcard_open(uint8_t *name);
 void sdcard_close();
 
-
+//test
 #endif
 
 
