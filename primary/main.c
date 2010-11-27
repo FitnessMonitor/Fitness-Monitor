@@ -68,7 +68,14 @@ int main(void)
 		if (ms_counter % 50)	// sample every 50ms		
 		{	
 			//sample the Acceleromiter
-			xaxis[accel_index++] = get_adc_sample(0);
+			unsigned int bytesWritten;
+			uint8_t sample;
+			char sample_text[6];
+			sample = get_adc_sample(0);
+			xaxis[accel_index++] = sample;
+			sprintf( &sample_text[0], "%d\n", (int) sample );
+			char *sdcard_text = &sample_text[0];
+			f_write(&logFile, &sample_text[0], 6, &bytesWritten);
 		}
 		if (ms_counter >= 1000) // every 1 seconds
 		{	
@@ -109,6 +116,7 @@ int main(void)
 		sleep_now();	// sleep until timer2 interrupt
 	}//endwhile
 }
+
 
 
 
