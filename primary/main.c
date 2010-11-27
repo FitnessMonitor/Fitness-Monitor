@@ -134,8 +134,8 @@ int main(void)
 			sample = get_adc_sample(0);
 			xaxis[accel_index++] = sample;
 			//i2s((int)sample, sample_text);
-			sprintf( sample_text, "%d\n", (int) sample );
-			char *sdcard_text = sample_text[0];
+			itoa((int)sample, sample_text, 10);
+			char *sdcard_text = &sample_text[0];
 			//itoa((int)sample, sample_text, 10);
 			//sprintf( &sdcard_text[0], "%s\n", sample_text);
 			f_write(&logFile, sample_text, 6, &bytesWritten);
