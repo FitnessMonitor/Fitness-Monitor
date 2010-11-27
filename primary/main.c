@@ -140,7 +140,7 @@ int main(void)
 			//sprintf( &sdcard_text[0], "%s\n", sample_text);
 			f_write(&logFile, sample_text, 6, &bytesWritten);
 		}
-		if (ms_counter >= 1000) // every 1 seconds
+		if (ms_counter == 1000) // every 1 seconds
 		{	
 			ms_counter = 0; // reset counter
 			accel_index = 0;
@@ -150,7 +150,7 @@ int main(void)
 			drawstring( disp_buffer, 0, 0, display_seconds );
 			write_buffer(disp_buffer);
 			seconds += 1;
-
+		
 			if (seconds == 60) // every 1 minute
 			{
 				drawstring( disp_buffer, 0, 1, "1 minute" );
@@ -161,6 +161,7 @@ int main(void)
 		
  			if (minutes % 10) // every 10 minutes
 			{
+				
 				if (minutes == 60)
 				{
 					hours++;
@@ -175,4 +176,5 @@ int main(void)
 	}
 	f_mount(0,0);
 }
+
 
