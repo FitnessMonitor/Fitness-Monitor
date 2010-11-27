@@ -12,8 +12,12 @@ static void IoInit ()
 	sei();
 }
 
-void setup() 
-{
+void setup(void) {
+	// turn on backlight
+	BLA_DDR |= _BV(BLA);
+	BLA_PORT |= _BV(BLA);
+
+	LED_DDR |= _BV(LED);
 	IoInit();
 	
 	st7565_init();
