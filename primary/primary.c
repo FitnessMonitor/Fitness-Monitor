@@ -27,7 +27,7 @@ void setup(void) {
 	clear_buffer(disp_buffer);
 
 	//testdrawchar(disp_buffer);
-	drawstring(disp_buffer, 0, 3, "Dan Cole");
+	drawstring(disp_buffer, 0, 3, "Fitness Monitor");
 	write_buffer(disp_buffer);
 	clear_buffer(disp_buffer);
 }
@@ -99,17 +99,13 @@ int sdcard_open(uint8_t hours, uint8_t minutes, uint8_t seconds)
 	unsigned int bytesWritten;
 	char file_name[13];
 	char *file_name_text = &file_name[0];
-	//sprintf(file_name_text, "/%2d_%2d_%2d.txt", (int) hours++, (int) minutes++, (int) seconds++ );
-	int dan = 6;
-	sprintf(file_name_text, "/%d1357.txt", dan);
+	sprintf(file_name_text, "/%d_%d_%d.txt", (int) hours, (int) minutes, (int) seconds );
 	if(f_open(&logFile, file_name_text, FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
 		//flag error
 		drawstring( disp_buffer, 0, 1, "f_open Error" );
 		write_buffer(disp_buffer);
 		return 1;
 	}
-	//f_write(&logFile, name, 13, &bytesWritten);
-	//f_write(&logFile, "\n", 1, &bytesWritten);
 	return 0;
 }
 void sdcard_close()

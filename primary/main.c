@@ -71,8 +71,8 @@ int main(void)
 	///initialize
 	setup();
 	init_sdcard();
-	//sprintf(file_name, "/%2d_%2d_%2d.txt", (int) hours++, (int) minutes++, (int) seconds++ );
 	sdcard_open(hours, minutes, seconds);
+
 	// initialize timer 2 to interrupt ever 1ms
 	timer2_1ms_setup();
 	while(1)
