@@ -52,7 +52,7 @@ int main(void)
 	uint8_t xaxis [100];
 	uint8_t xavg;
 	uint8_t steps;
-	uint8_t step_count;
+	uint16_t step_count;
 	uint8_t activity_level;
 	uint16_t activity_sum;
 
@@ -70,7 +70,7 @@ int main(void)
 
 	//initialize
 	setup();
-	init_sdcard();
+	//init_sdcard();
 	//sdcard_open(&minutes);
 	// initialize timer 2 to interrupt ever 1ms
 	timer2_1ms_setup();
@@ -103,6 +103,7 @@ int main(void)
 		
 			get_steps(&xaxis[0], 20, &xavg, &steps, &activity_level);
 			step_count += steps;
+			activity_sum+=activity_level;
 
 			if (seconds >= 60) // every 1 minute
 			{
@@ -115,13 +116,17 @@ int main(void)
 				} //endif
 
 				//store the number of steps since the last minute
-				steps_delta[store_index] = 0;
+				//steps_delta[store_index] = step_count;
+				//step_count = 0;
 
 				//store the value recieved 
-				heart_rate[store_index] = nRF24L01_data[0]; 
+				//heart_rate[store_index] = nRF24L01_data[0]; 
+				//nRF24L01_data[0] = 0;
 				//nRF24L01_RX_powerup(); //turn on reciever to recive next heart_rate package;
 				
-				activity[store_index] = activity_sum / 10;
+				//store the activity level;
+				//activity[store_index] = activity_sum / 10;
+				//activity_sum = 0;
 				store_index++; //increment the index
 
 

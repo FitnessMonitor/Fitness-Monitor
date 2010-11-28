@@ -11,7 +11,7 @@ program : $(TARGET).hex
 #	avrdude -c usbtiny -p m328p -U flash:w:main.hex -U lfuse:w:0xe2:m  -U hfuse:w:0xd9:m -U efuse:w:0x07:m -B 3
 #switch to 1MHZ
 #	avrdude -c usbtiny -p m328p -U flash:w:main.hex -U lfuse:w:0x62:m  -U hfuse:w:0xd9:m -U efuse:w:0x07:m -B 3
-
+	make clean
 %.obj : %.o
 	$(CC) $(CFLAGS) $< -o $@
 
