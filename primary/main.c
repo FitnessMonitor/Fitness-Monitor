@@ -106,8 +106,15 @@ int main(void)
 			clear_buffer(&disp_buffer[0]);
 			disp_hms(hours, minutes, seconds);
 			get_steps(&xaxis[0], 20, &xavg, &steps, &activity_level);
-			//step_count += steps;
-			//activity_sum+=activity_level;
+			step_count += steps;
+			activity_sum += activity_level;
+
+
+			char display_str[40];
+			sprintf( &display_str[0], "steps: %d  activity: %d", (int) step_count, (int) activity_level );
+			drawstring( disp_buffer, 0, 2, &display_str[0] );
+			write_buffer(disp_buffer);
+
 
 			if (seconds >= 60) // every 1 minute
 			{
@@ -120,22 +127,21 @@ int main(void)
 				} //endif
 
 				//store the number of steps since the last minute
-				steps_delta[store_index] = 7;//step_count;
+				steps_delta[store_index] = step_count;
 				step_count = 0;
 
 				//store the value recieved 
-				heart_rate[store_index] = 56;//nRF24L01_data[0]; 
+				heart_rate[store_index] = nRF24L01_data[0]; 
 				nRF24L01_data[0] = 0;
 				//nRF24L01_RX_powerup(); //turn on reciever to recive next heart_rate package;
 				
 				//store the activity level;
 				
-				activity[store_index] = 10;///activity_sum / 10;
+				activity[store_index] = activity_sum / 10;
 				activity_sum = 0;
 				store_index++; //increment the index
 
-
- 				if (minutes == 1) // every 10 minutes
+ 				if ((minutes % 10) == 0) // every 10 minutes
 				{	
 					store_index = 0;
 

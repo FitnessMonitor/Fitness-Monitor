@@ -128,17 +128,13 @@ void disp_addr(int addr)
 void get_steps(uint8_t *points, uint8_t size, uint16_t * avg, uint16_t * steps, uint16_t * activity_level)
 {
 	int i;
-	uint16_t sum = 60000;
-	*avg = sum;
+	uint16_t sum = 0;
 	(*steps) = 0;
 	for ( i = 0 ; i < size ; i++ )
 	{
 		sum += points[i];	
 	}
-	//*avg = 10;
 	*avg = (sum/size);
-	disp_addr((int) avg);
-
 	uint16_t max = (*avg)+5;
 	uint16_t min = (*avg)-5;
 	for ( i = 1 ; i < size ; i++ )
