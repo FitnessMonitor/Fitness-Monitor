@@ -116,21 +116,31 @@ void sdcard_close()
 
 
 // accelerometer functions
-
-
-void get_steps(uint8_t *points, uint8_t size, uint8_t * avg, uint8_t * steps, uint8_t * activity_level)
+void disp_addr(int addr)
 {
+	char display_str[10];
+	sprintf( &display_str[0], "%d", (int) addr);
+	drawstring( disp_buffer, 0, 2, &display_str[0] );
+	write_buffer(disp_buffer);
+}
+
+
+void get_steps(uint8_t *points, uint8_t size, uint16_t * avg, uint16_t * steps, uint16_t * activity_level)
+{
+	disp_addr((int) avg);
 	int i;
 	uint16_t sum = 0;
-	*steps = 0;
+	(*steps) = 0;
 	for ( i = 0 ; i < size ; i++ )
 	{
 		sum += points[i];	
 	}
-	//(*avg) = sum / size;
+	//*avg = 10;
+	*avg = (sum/size);
+
 	
-	uint8_t max = (*avg)+5;
-	uint8_t min = (*avg)-5;
+	uint16_t max = (*avg)+5;
+	uint16_t min = (*avg)-5;
 	for ( i = 1 ; i < size ; i++ )
 	{
 		//count steps
@@ -148,6 +158,7 @@ void get_steps(uint8_t *points, uint8_t size, uint8_t * avg, uint8_t * steps, ui
 			sum += ((*avg) - points[i]);
 		}
 	}
+	
 	//(*activity_level) = sum / size;	
 }
 

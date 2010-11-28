@@ -50,17 +50,17 @@ int main(void)
 	//used for calculating steps & activity
 	uint8_t accel_index = 0;
 	uint8_t xaxis [100];
-	uint8_t xavg;
-	uint8_t steps;
+	uint16_t xavg;
+	uint16_t steps;
 	uint16_t step_count;
-	uint8_t activity_level;
+	uint16_t activity_level;
 	uint16_t activity_sum;
 
 
 	//arrays to store data between writes
-	uint8_t heart_rate[15];
+	uint16_t heart_rate[15];
 	uint16_t steps_delta[15];
-	uint8_t	activity[15];
+	uint16_t activity[15];
 	uint8_t store_index = 0;
 
 	//used for writing data
