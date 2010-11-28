@@ -76,7 +76,7 @@ int main(void)
 	timer2_1ms_setup();
 	while(1)
 	{	
-		if (ms_counter % 50)	// sample every 50ms		
+		if ((ms_counter % 50) == 0)	// sample every 50ms		
 		{	
 			//sample the Acceleromiter 
 			xaxis[accel_index++] = get_adc_sample(0);

@@ -128,7 +128,8 @@ void disp_addr(int addr)
 void get_steps(uint8_t *points, uint8_t size, uint16_t * avg, uint16_t * steps, uint16_t * activity_level)
 {
 	int i;
-	uint16_t sum = 0;
+	uint16_t sum = 60000;
+	*avg = sum;
 	(*steps) = 0;
 	for ( i = 0 ; i < size ; i++ )
 	{
@@ -138,7 +139,6 @@ void get_steps(uint8_t *points, uint8_t size, uint16_t * avg, uint16_t * steps, 
 	*avg = (sum/size);
 	disp_addr((int) avg);
 
-	
 	uint16_t max = (*avg)+5;
 	uint16_t min = (*avg)-5;
 	for ( i = 1 ; i < size ; i++ )
@@ -146,7 +146,7 @@ void get_steps(uint8_t *points, uint8_t size, uint16_t * avg, uint16_t * steps, 
 		//count steps
 		if ((points[i] <= min) && (points[i] >= max))
 		{
-			//(*steps)++;
+			(*steps)++;
 		}
 		//figure out activity level (average varience)
 		if (points[i] >= *avg)
@@ -159,7 +159,7 @@ void get_steps(uint8_t *points, uint8_t size, uint16_t * avg, uint16_t * steps, 
 		}
 	}
 	
-	//(*activity_level) = sum / size;	
+	(*activity_level) = sum / size;	
 }
 
 
