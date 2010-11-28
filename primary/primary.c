@@ -98,7 +98,7 @@ int sdcard_open(uint8_t *name)
 {
 	char file_name[16];
 	sprintf( file_name, "/%n.txt", (int *) name );
-	if(f_open(&logFile, &file_name[0], FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
+	if(f_open(&logFile, "101127.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
 		//flag error
 		drawstring( disp_buffer, 0, 1, "f_open Error" );
 		write_buffer(disp_buffer);
