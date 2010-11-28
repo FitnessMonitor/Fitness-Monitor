@@ -58,13 +58,12 @@ int main(void)
 
 
 	//arrays to store data between writes
-	uint8_t 	heart_rate[15];
-	uint16_t	steps_delta[15];
-	uint8_t		activity[15];
-	uint8_t		store_index;
+	uint8_t heart_rate[15];
+	uint16_t steps_delta[15];
+	uint8_t	activity[15];
+	uint8_t store_index = 0;
 
 	//used for writing data
-	char file_name[13];
 	char data_string[100];
 	unsigned int bytesWritten;
 
@@ -104,9 +103,8 @@ int main(void)
 			ms_counter = 0; // reset counter
 			seconds ++;
 			accel_index = 0;
-			
+			clear_buffer(&disp_buffer[0]);
 			disp_hms(hours, minutes, seconds);
-		
 			get_steps(&xaxis[0], 20, &xavg, &steps, &activity_level);
 			//step_count += steps;
 			//activity_sum+=activity_level;

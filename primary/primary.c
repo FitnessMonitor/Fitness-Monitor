@@ -35,7 +35,7 @@ void setup(void) {
 void disp_hms(uint8_t hours, uint8_t minutes, uint8_t seconds)
 {
 	char display_time[10];
-	sprintf( &display_time[0], "%d:%d:%d", (int) hours, (int)minutes, (int) seconds );
+	sprintf( &display_time[0], "%d:%d:%d", (int) hours, (int) minutes, (int) seconds );
 	drawstring( disp_buffer, 0, 0, &display_time[0] );
 	write_buffer(disp_buffer);
 }
@@ -96,7 +96,7 @@ int init_sdcard(void)
 
 int sdcard_open(uint8_t hours, uint8_t minutes, uint8_t seconds)
 {
-	unsigned int bytesWritten;
+	//unsigned int bytesWritten;
 	char file_name[13];
 	char *file_name_text = &file_name[0];
 	sprintf(file_name_text, "/%d_%d_%d.txt", (int) hours, (int) minutes, (int) seconds );
@@ -118,35 +118,37 @@ void sdcard_close()
 // accelerometer functions
 
 
-void get_steps(uint8_t *points, int size, uint8_t * avg, uint8_t * steps, uint8_t * activity_level)
+void get_steps(uint8_t *points, uint8_t size, uint8_t * avg, uint8_t * steps, uint8_t * activity_level)
 {
 	int i;
-	uint32_t sum = 0;
+	uint16_t sum = 0;
 	*steps = 0;
 	for ( i = 0 ; i < size ; i++ )
 	{
 		sum += points[i];	
 	}
-	*avg = sum / size;
+	//(*avg) = sum / size;
 	
+	uint8_t max = (*avg)+5;
+	uint8_t min = (*avg)-5;
 	for ( i = 1 ; i < size ; i++ )
 	{
 		//count steps
-		if ((points[i] <= (*avg-5)) && (points[i] >= (*avg+5)))
+		if ((points[i] <= min) && (points[i] >= max))
 		{
-			*steps++;
+			//(*steps)++;
 		}
 		//figure out activity level (average varience)
 		if (points[i] >= *avg)
 		{
-			sum += (points[i] - *avg);
+			sum += (points[i] - (*avg));
 		}
 		else
 		{
-			sum += (*avg - points[i]);
+			sum += ((*avg) - points[i]);
 		}
 	}
-	*activity_level = sum / size;	
+	//(*activity_level) = sum / size;	
 }
 
 
