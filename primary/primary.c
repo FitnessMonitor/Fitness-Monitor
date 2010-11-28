@@ -72,6 +72,8 @@ void i2s(int i,char *s) // Convert Integer to String
 	p[len] = 0;
 }
 
+
+//SD card functions
 int init_sdcard(void)
 {
 	DSTATUS driveStatus = disk_initialize(0);
@@ -96,7 +98,7 @@ int sdcard_open(uint8_t *name)
 {
 	char file_name[16];
 	sprintf( file_name, "/%n.txt", (int *) name );
-	if(f_open(&logFile, "20101127.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
+	if(f_open(&logFile, &file_name[0], FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
 		//flag error
 		drawstring( disp_buffer, 0, 1, "f_open Error" );
 		write_buffer(disp_buffer);
@@ -107,6 +109,13 @@ int sdcard_open(uint8_t *name)
 void sdcard_close()
 {
 	f_close(&logFile);
+}
+
+
+
+// accelerometer functions
+uint8_t get_average(uint8_t *points, int size)
+{
 }
 
 
