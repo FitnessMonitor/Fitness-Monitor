@@ -1,7 +1,7 @@
 #define F_CPU 1000000UL /* 1 MHz Internal Oscillator */
 #include <avr/io.h>
 #include <util/delay.h>
-//#include <avr/pgmspace.h>
+#include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include <avr/power.h>
 #include <stdlib.h>

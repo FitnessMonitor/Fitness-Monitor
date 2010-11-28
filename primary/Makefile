@@ -1,5 +1,5 @@
 CC=avr-gcc
-CFLAGS=-g -Os -Wall -mcall-prologues -mmcu=atmega328p
+CFLAGS=-g -Os -Wall -mcall-prologues -mmcu=atmega328p -Wl,-Map,test.map
 OBJ2HEX=avr-objcopy 
 UISP=uisp 
 TARGET=main
