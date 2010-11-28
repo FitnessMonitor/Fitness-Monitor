@@ -12,8 +12,12 @@ static void IoInit ()
 	sei();
 }
 
-void setup() 
-{
+void setup(void) {
+	// turn on backlight
+	BLA_DDR |= _BV(BLA);
+	BLA_PORT |= _BV(BLA);
+
+	LED_DDR |= _BV(LED);
 	IoInit();
 	
 	st7565_init();
@@ -68,6 +72,8 @@ void i2s(int i,char *s) // Convert Integer to String
 	p[len] = 0;
 }
 
+
+//SD card functions
 int init_sdcard(void)
 {
 	DSTATUS driveStatus = disk_initialize(0);
@@ -92,7 +98,7 @@ int sdcard_open(uint8_t *name)
 {
 	char file_name[16];
 	sprintf( file_name, "/%n.txt", (int *) name );
-	if(f_open(&logFile, "20101127.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
+	if(f_open(&logFile, &file_name[0], FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
 		//flag error
 		drawstring( disp_buffer, 0, 1, "f_open Error" );
 		write_buffer(disp_buffer);
@@ -104,4 +110,41 @@ void sdcard_close()
 {
 	f_close(&logFile);
 }
+
+
+
+// accelerometer functions
+
+
+void get_steps(uint8_t *points, int size, uint8_t * avg, uint8_t * steps, uint8_t * activity_level)
+{
+	int i;
+	uint32_t sum = 0;
+	*steps = 0;
+	for ( i = 0 ; i < size ; i++ )
+	{
+		sum += points[i];	
+	}
+	*avg = sum / size;
+	
+	for ( i = 1 ; i < size ; i++ )
+	{
+		//count steps
+		if ((points[i] <= (*avg-5)) && (points[i] >= (*avg+5)))
+		{
+			*steps++;
+		}
+		//figure out activity level (average varience)
+		if (points[i] >= *avg)
+		{
+			sum += (points[i] - *avg);
+		}
+		else
+		{
+			sum += (*avg - points[i]);
+		}
+	}
+	*activity_level = sum / size;	
+}
+
 

@@ -40,141 +40,118 @@ ISR( PCINT2_vect )
 }
 
 
-static void IoInit ()
-{
-	PORTB = 0b10110000; 	// Port B
-	DDRB  = 0b00001000;
-
-	DDRC |= 1<<PC3;
-	DDRC |= 1<<PC2;
-
-	sei();
-
-}
-
-
-void setup(void) {
-	// turn on backlight
-	BLA_DDR |= _BV(BLA);
-	BLA_PORT |= _BV(BLA);
-
-	LED_DDR |= _BV(LED);
-	IoInit();
-	
-	st7565_init();
-	st7565_command(CMD_DISPLAY_ON);
-	st7565_command(CMD_SET_ALLPTS_NORMAL);
-	clear_screen();
-	clear_buffer(disp_buffer);
-
-	//testdrawchar(disp_buffer);
-	drawstring(disp_buffer, 0, 3, "Fitness Monitor");
-	write_buffer(disp_buffer);
-	clear_buffer(disp_buffer);
-}
-
-int init_sdcard(void)
-{
-	DSTATUS driveStatus = disk_initialize(0);
-	if ((driveStatus & STA_NODISK) || (driveStatus & STA_NOINIT)) //check for initialization errors
-	{
-   		drawstring(disp_buffer, 0, 1, "SD Initialization Error");
-   		write_buffer(disp_buffer);
-		return 1;	//error 1 initialization failed
-	}
-	else{	//dont try mounting if initialization failed
-		if(f_mount(0, &FileSystemObject)!=FR_OK) {
-			//flag error
-			drawstring( disp_buffer, 0, 1, "File System Mounting Error" );
-			write_buffer(disp_buffer);
-			return 2;	//error 2 mounting failed
-		}
-	}
-	return 0; //no errors
-}
-
-int sdcard_open(uint8_t *name)
-{
-	char file_name[16];
-	sprintf( file_name, "/%n.txt", (int *) name );
-	if(f_open(&logFile, "20101127.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
-		//flag error
-		drawstring( disp_buffer, 0, 1, "f_open Error" );
-		write_buffer(disp_buffer);
-		return 1;
-	}
-	return 0;
-}
-void sdcard_close()
-{
-	f_close(&logFile);
-}
-
 int main(void)
 {
+	//variables for keeping track of time
 	uint8_t seconds = 0;
 	uint8_t minutes = 0;
 	uint8_t hours = 0;
+
+	//used for calculating steps & activity
 	uint8_t accel_index = 0;
 	uint8_t xaxis [100];
-	char display_seconds[10];
+	uint8_t xavg;
+	uint8_t steps;
+	uint16_t step_count;
+	uint8_t activity_level;
+	uint16_t activity_sum;
 
+
+	//arrays to store data between writes
+	uint8_t 	heart_rate[15];
+	uint16_t	steps_delta[15];
+	uint8_t		activity[15];
+	uint8_t		store_index;
+
+	//used for writing data
+	char file_name[10];
+	char data_string[100];
+	unsigned int bytesWritten;
+
+	//initialize
 	setup();
-	init_sdcard();
-	sdcard_open(&minutes);
+	//init_sdcard();
+	//sdcard_open(&minutes);
 	// initialize timer 2 to interrupt ever 1ms
 	timer2_1ms_setup();
 	while(1)
 	{	
 		if (ms_counter % 50)	// sample every 50ms		
-		{
-			unsigned int bytesWritten;
+		{	
+			//sample the Acceleromiter 
+			xaxis[accel_index++] = get_adc_sample(0);
+
+			/* Dan Cole's test area
 			uint8_t sample;
 			char sample_text[6];
 			sample = get_adc_sample(0);
 			xaxis[accel_index++] = sample;
-			//i2s((int)sample, sample_text);
-			itoa((int)sample, sample_text, 10);
+			sprintf( &sample_text[0], "%d\n", (int) sample );
 			char *sdcard_text = &sample_text[0];
-			//itoa((int)sample, sample_text, 10);
-			//sprintf( &sdcard_text[0], "%s\n", sample_text);
-			f_write(&logFile, sample_text, 6, &bytesWritten);
+			//f_write(&logFile, &sample_text[0], 6, &bytesWritten);
+			f_write(&logFile, "text \n", 6, &bytesWritten);
+			
+			*/
 		}
-		if (ms_counter == 1000) // every 1 seconds
+		if (ms_counter >= 1000) // every 1 seconds
 		{	
 			ms_counter = 0; // reset counter
+			seconds ++;
 			accel_index = 0;
-			//unsigned int bytesWritten;
-			//f_write(&logFile, "This is a test of time.\n", 24, &bytesWritten);
-			sprintf( display_seconds, "%d seconds", (int) seconds );
-			drawstring( disp_buffer, 0, 0, display_seconds );
-			write_buffer(disp_buffer);
-			seconds += 1;
+			
+			disp_hms(hours, minutes, seconds);
 		
-			if (seconds == 60) // every 1 minute
+			get_steps(&xaxis[0], 20, &xavg, &steps, &activity_level);
+			step_count += steps;
+			activity_sum+=activity_level;
+
+			if (seconds >= 60) // every 1 minute
 			{
-				drawstring( disp_buffer, 0, 1, "1 minute" );
-				write_buffer(disp_buffer);
-				sdcard_close();
-				//sdcard_open(&minutes);
-			}
-		
- 			if (minutes % 10) // every 10 minutes
-			{
-				
-				if (minutes == 60)
+				minutes ++;
+				seconds = 0;
+				if (minutes >= 60)
 				{
 					hours++;
 					minutes = 0;
-				}
-				drawstring( disp_buffer, 0, 2, "10 minutes" );
-				write_buffer(disp_buffer);
-			}
-		}
+				} //endif
 
+				//store the number of steps since the last minute
+				//steps_delta[store_index] = step_count;
+				//step_count = 0;
+
+				//store the value recieved 
+				//heart_rate[store_index] = nRF24L01_data[0]; 
+				//nRF24L01_data[0] = 0;
+				//nRF24L01_RX_powerup(); //turn on reciever to recive next heart_rate package;
+				
+				//store the activity level;
+				//activity[store_index] = activity_sum / 10;
+				//activity_sum = 0;
+				store_index++; //increment the index
+
+
+ 				if (minutes % 10) // every 10 minutes
+				{	
+					store_index = 0;
+
+					//Write the data to the SD card
+					/*  once the sd car problems are figured out I think this will work.  
+					sprintf ( &file_name[0], "%d_%d", hours, minutes);
+					sdcard_open(&file_name[0]);
+					int k;
+					for (k = 0; k < 10; k++)
+					{			
+					//each minute gets its own line		
+					sprintf( &data_string[0], "%d,%d,%d,\n", (int) steps_delta[k], (int) heart_rate[k], (int) activity[k] );
+					f_write(&logFile, &data_string[0], 10, &bytesWritten);
+					}
+					sdcard_close();
+					*/
+
+				} //endif
+			} //endif	
+		} //endif
 		sleep_now();	// sleep until timer2 interrupt
-	}
-	f_mount(0,0);
+	}//endwhile
 }
-
 
