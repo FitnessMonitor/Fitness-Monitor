@@ -71,7 +71,7 @@ int main(void)
 	///initialize
 	setup();
 	init_sdcard();
-	sdcard_open(hours, minutes, seconds);
+	//sdcard_open(hours, minutes, seconds);
 
 	// initialize timer 2 to interrupt ever 1ms
 	timer2_1ms_setup();
@@ -83,6 +83,7 @@ int main(void)
 			xaxis[accel_index++] = get_adc_sample(0);
 
 			// Dan Cole's test area
+			/*
 			unsigned int bytesWritten;
 			uint8_t sample;
 			char sample_text[4];
@@ -92,7 +93,7 @@ int main(void)
 			sprintf(sdcard_text, "%d    ", (int) sample );
 			f_write(&logFile, sdcard_text, 4, &bytesWritten);
 			f_write(&logFile, "\n", 1, &bytesWritten);
-			
+			*/
 		}
 		if (ms_counter >= 1000) // every 1 seconds
 		{	
@@ -106,7 +107,7 @@ int main(void)
 			
 			disp_hms(hours, minutes, seconds);
 		
-			//get_steps(&xaxis[0], 20, &xavg, &steps, &activity_level);
+			get_steps(&xaxis[0], 20, &xavg, &steps, &activity_level);
 			//step_count += steps;
 			//activity_sum+=activity_level;
 
@@ -121,38 +122,36 @@ int main(void)
 				} //endif
 
 				//store the number of steps since the last minute
-				//steps_delta[store_index] = step_count;
-				//step_count = 0;
+				steps_delta[store_index] = 7;//step_count;
+				step_count = 0;
 
 				//store the value recieved 
-				//heart_rate[store_index] = nRF24L01_data[0]; 
-				//nRF24L01_data[0] = 0;
+				heart_rate[store_index] = 56;//nRF24L01_data[0]; 
+				nRF24L01_data[0] = 0;
 				//nRF24L01_RX_powerup(); //turn on reciever to recive next heart_rate package;
 				
 				//store the activity level;
-				//activity[store_index] = activity_sum / 10;
-				//activity_sum = 0;
+				
+				activity[store_index] = 10;///activity_sum / 10;
+				activity_sum = 0;
 				store_index++; //increment the index
 
 
- 				if (minutes % 10) // every 10 minutes
+ 				if (minutes == 1) // every 10 minutes
 				{	
 					store_index = 0;
 
-					//Write the data to the SD card
-					/*  once the sd car problems are figured out I think this will work.  
-					sprintf ( &file_name[0], "%d_%d", hours, minutes);
-					sdcard_open(&file_name[0]);
+					//Write the data to the SD card 
+					sdcard_open(hours, minutes, seconds);
 					int k;
 					for (k = 0; k < 10; k++)
 					{			
 					//each minute gets its own line		
-					sprintf( &data_string[0], "%d,%d,%d,\n", (int) steps_delta[k], (int) heart_rate[k], (int) activity[k] );
+					sprintf( &data_string[0], "%d,%d,%d,      ", (int) steps_delta[k], (int) heart_rate[k], (int) activity[k] );
 					f_write(&logFile, &data_string[0], 10, &bytesWritten);
+					f_write(&logFile, "\n", 1, & bytesWritten);
 					}
 					sdcard_close();
-					*/
-
 				} //endif
 			} //endif	
 		} //endif
