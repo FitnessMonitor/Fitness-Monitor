@@ -43,7 +43,7 @@ ISR( PCINT2_vect )
 int main(void)
 {
 	//variables for keeping track of time
-	uint8_t seconds = 0;
+	uint8_t seconds = 1;
 	uint8_t minutes = 0;
 	uint8_t hours = 0;
 
@@ -64,14 +64,15 @@ int main(void)
 	uint8_t		store_index;
 
 	//used for writing data
-	char file_name[10];
+	char file_name[13];
 	char data_string[100];
 	unsigned int bytesWritten;
 
 	///initialize
 	setup();
 	init_sdcard();
-	sdcard_open(&minutes);
+	//sprintf(file_name, "/%2d_%2d_%2d.txt", (int) hours++, (int) minutes++, (int) seconds++ );
+	sdcard_open(hours, minutes, seconds);
 	// initialize timer 2 to interrupt ever 1ms
 	timer2_1ms_setup();
 	while(1)
@@ -88,13 +89,17 @@ int main(void)
 			sample = get_adc_sample(0);
 			xaxis[accel_index++] = sample;
 			char *sdcard_text = &sample_text[0];
-			sprintf(sdcard_text, "%d\n", (int) sample );
+			sprintf(sdcard_text, "%d    ", (int) sample );
 			f_write(&logFile, sdcard_text, 4, &bytesWritten);
+			f_write(&logFile, "\n", 1, &bytesWritten);
 			
 		}
 		if (ms_counter >= 1000) // every 1 seconds
 		{	
 			sdcard_close();
+			drawstring(disp_buffer, 0, 4, "SD Card Closed");
+			write_buffer(disp_buffer);
+
 			ms_counter = 0; // reset counter
 			seconds ++;
 			accel_index = 0;

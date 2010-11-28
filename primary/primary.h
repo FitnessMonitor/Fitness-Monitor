@@ -14,7 +14,7 @@ void setup();
 void disp_hms(uint8_t hours, uint8_t minutes, uint8_t seconds);
 void i2s(int i,char *s);
 int init_sdcard(void);
-int sdcard_open(uint8_t *name);
+int sdcard_open(uint8_t hours, uint8_t minutes, uint8_t seconds);
 void sdcard_close();
 void get_steps(uint8_t *points, int size, uint8_t * avg, uint8_t * steps, uint8_t * activity_level);
 
