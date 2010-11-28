@@ -98,11 +98,11 @@ int main(void)
 			ms_counter = 0; // reset counter
 			seconds ++;
 			accel_index = 0;
-
-			get_steps(&xaxis[0], 125, &xavg, &steps, &activity_level);
-			step_count += steps;
 			
 			disp_hms(hours, minutes, seconds);
+		
+			get_steps(&xaxis[0], 20, &xavg, &steps, &activity_level);
+			step_count += steps;
 
 			if (seconds >= 60) // every 1 minute
 			{
@@ -113,9 +113,6 @@ int main(void)
 					hours++;
 					minutes = 0;
 				} //endif
-				
-				void sdcard_close();
-
 
 				//store the number of steps since the last minute
 				steps_delta[store_index] = 0;
