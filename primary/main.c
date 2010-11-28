@@ -82,15 +82,14 @@ int main(void)
 			xaxis[accel_index++] = get_adc_sample(0);
 
 			/* Dan Cole's test area
+			unsigned int bytesWritten;
 			uint8_t sample;
-			char sample_text[6];
+			char sample_text[4];
 			sample = get_adc_sample(0);
 			xaxis[accel_index++] = sample;
-			sprintf( &sample_text[0], "%d\n", (int) sample );
 			char *sdcard_text = &sample_text[0];
-			//f_write(&logFile, &sample_text[0], 6, &bytesWritten);
-			f_write(&logFile, "text \n", 6, &bytesWritten);
-			
+			sprintf(sdcard_text, "%d\n", (int) sample );
+			f_write(&logFile, sdcard_text, 4, &bytesWritten);
 			*/
 		}
 		if (ms_counter >= 1000) // every 1 seconds
