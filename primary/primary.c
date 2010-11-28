@@ -39,7 +39,26 @@ FATFS FileSystemObject;
 
 
 
+<<<<<<< HEAD
 DSTATUS driveStatus = disk_initialize(0);
+=======
+int sdcard_open(uint8_t *name)
+{
+	char file_name[16];
+	sprintf( file_name, "/%n.txt", (int *) name );
+	if(f_open(&logFile, "101127.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS)!=FR_OK) {
+		//flag error
+		drawstring( disp_buffer, 0, 1, "f_open Error" );
+		write_buffer(disp_buffer);
+		return 1;
+	}
+	return 0;
+}
+void sdcard_close()
+{
+	f_close(&logFile);
+}
+>>>>>>> 03c176fc7b374dac6ae82cdd4f61202e8696bb64
 
 
 if ((driveStatus & STA_NODISK) || (driveStatus & STA_NOINIT)){

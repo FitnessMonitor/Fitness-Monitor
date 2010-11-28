@@ -119,6 +119,15 @@ int main(void)
 	uint8_t xaxis [100];
 	char display_seconds[10];
 
+<<<<<<< HEAD
+=======
+	//used for writing data
+	char file_name[10];
+	char data_string[100];
+	unsigned int bytesWritten;
+
+	///initialize
+>>>>>>> 03c176fc7b374dac6ae82cdd4f61202e8696bb64
 	setup();
 	init_sdcard();
 	sdcard_open(&minutes);
@@ -127,19 +136,37 @@ int main(void)
 	while(1)
 	{	
 		if (ms_counter % 50)	// sample every 50ms		
+<<<<<<< HEAD
 		{
+=======
+		{	
+			//sample the Acceleromiter 
+			xaxis[accel_index++] = get_adc_sample(0);
+
+			// Dan Cole's test area
+>>>>>>> 03c176fc7b374dac6ae82cdd4f61202e8696bb64
 			unsigned int bytesWritten;
 			uint8_t sample;
-			char sample_text[6];
+			char sample_text[4];
 			sample = get_adc_sample(0);
 			xaxis[accel_index++] = sample;
 			char *sdcard_text = &sample_text[0];
+<<<<<<< HEAD
 			sprintf(sdcard_text, "%d     ", (int) sample );
 			f_write(&logFile, sdcard_text, 6, &bytesWritten);
 			f_write(&logFile, "\n", 1, &bytesWritten);
 		}
 		if (ms_counter >= 1000) // every 1 seconds
 		{
+=======
+			sprintf(sdcard_text, "%d\n", (int) sample );
+			f_write(&logFile, sdcard_text, 4, &bytesWritten);
+			
+		}
+		if (ms_counter >= 1000) // every 1 seconds
+		{	
+			sdcard_close();
+>>>>>>> 03c176fc7b374dac6ae82cdd4f61202e8696bb64
 			ms_counter = 0; // reset counter
 			accel_index = 0;
 			//unsigned int bytesWritten;
@@ -157,7 +184,15 @@ int main(void)
 				//sdcard_open(&minutes);
 			}
 		
+<<<<<<< HEAD
  			if (minutes % 10) // every 10 minutes
+=======
+			//get_steps(&xaxis[0], 20, &xavg, &steps, &activity_level);
+			//step_count += steps;
+			//activity_sum+=activity_level;
+
+			if (seconds >= 60) // every 1 minute
+>>>>>>> 03c176fc7b374dac6ae82cdd4f61202e8696bb64
 			{
 				if (minutes == 60)
 				{
