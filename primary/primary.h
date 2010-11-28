@@ -16,7 +16,7 @@ void i2s(int i,char *s);
 int init_sdcard(void);
 int sdcard_open(uint8_t *name);
 void sdcard_close();
-uint8_t get_average(uint8_t *points, int size);
+void get_steps(uint8_t *points, int size, uint8_t * avg, uint8_t * steps, uint8_t * activity_level);
 
 //test
 #endif

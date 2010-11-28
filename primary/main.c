@@ -47,10 +47,14 @@ int main(void)
 	uint8_t minutes = 0;
 	uint8_t hours = 0;
 
-	//used for calculating steps
+	//used for calculating steps & activity
 	uint8_t accel_index = 0;
 	uint8_t xaxis [100];
 	uint8_t xavg;
+	uint8_t steps;
+	uint8_t step_count;
+	uint8_t activity_level;
+	uint16_t activity_sum;
 
 
 	//arrays to store data between writes
@@ -67,7 +71,7 @@ int main(void)
 	//initialize
 	setup();
 	init_sdcard();
-	sdcard_open(&minutes);
+	//sdcard_open(&minutes);
 	// initialize timer 2 to interrupt ever 1ms
 	timer2_1ms_setup();
 	while(1)
@@ -75,6 +79,9 @@ int main(void)
 		if (ms_counter % 50)	// sample every 50ms		
 		{	
 			//sample the Acceleromiter 
+			xaxis[accel_index++] = get_adc_sample(0);
+
+			/* Dan Cole's test area
 			uint8_t sample;
 			char sample_text[6];
 			sample = get_adc_sample(0);
@@ -83,6 +90,8 @@ int main(void)
 			char *sdcard_text = &sample_text[0];
 			//f_write(&logFile, &sample_text[0], 6, &bytesWritten);
 			f_write(&logFile, "text \n", 6, &bytesWritten);
+			
+			*/
 		}
 		if (ms_counter >= 1000) // every 1 seconds
 		{	
@@ -90,16 +99,16 @@ int main(void)
 			seconds ++;
 			accel_index = 0;
 
-			xavg = get_average(&xaxis[0], 125);
-
+			get_steps(&xaxis[0], 125, &xavg, &steps, &activity_level);
+			step_count += steps;
+			
 			disp_hms(hours, minutes, seconds);
 
 			if (seconds >= 60) // every 1 minute
 			{
-				//updtae counters
-				seconds = 0;	//reset seconds
-				minutes ++;	//increment minutes
-				if (minutes == 60)
+				minutes ++;
+				seconds = 0;
+				if (minutes >= 60)
 				{
 					hours++;
 					minutes = 0;
@@ -114,7 +123,8 @@ int main(void)
 				//store the value recieved 
 				heart_rate[store_index] = nRF24L01_data[0]; 
 				//nRF24L01_RX_powerup(); //turn on reciever to recive next heart_rate package;
-
+				
+				activity[store_index] = activity_sum / 10;
 				store_index++; //increment the index
 
 
@@ -123,7 +133,6 @@ int main(void)
 					store_index = 0;
 
 					//Write the data to the SD card
-				
 					/*  once the sd car problems are figured out I think this will work.  
 					sprintf ( &file_name[0], "%d_%d", hours, minutes);
 					sdcard_open(&file_name[0]);

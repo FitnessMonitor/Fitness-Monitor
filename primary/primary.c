@@ -114,8 +114,27 @@ void sdcard_close()
 
 
 // accelerometer functions
-uint8_t get_average(uint8_t *points, int size)
+
+
+void get_steps(uint8_t *points, int size, uint8_t * avg, uint8_t * steps, uint8_t * activity_level)
 {
+	int i;
+	uint32_t sum = 0;
+	for ( i = 0 ; i < size ; i++ )
+	{
+		sum += points[i];	
+	}
+	*avg = sum / size;
+	
+	for ( i = 1 ; i < size ; i++ )
+	{
+		//count steps
+		if ((points[i] <= (*avg-5)) && (points[i] >= (*avg+5))) *steps++;
+		//figure out activity level (distance from the avearge)
+		if (points[i] >= *avg) sum += (points[i] - *avg);
+		else sum += (*avg - points[i]);
+	}
+	*activity_level = sum / size;	
 }
 
 
