@@ -116,46 +116,42 @@ void sdcard_close()
 
 
 // accelerometer functions
-void disp_addr(int addr)
-{
-	char display_str[10];
-	sprintf( &display_str[0], "%d", (int) addr);
-	drawstring( disp_buffer, 0, 2, &display_str[0] );
-	write_buffer(disp_buffer);
-}
 
 
 void get_steps(uint8_t *points, uint8_t size, uint16_t * avg, uint16_t * steps, uint16_t * activity_level)
 {
 	int i;
 	uint16_t sum = 0;
+	uint16_t local_avg = 0;
 	(*steps) = 0;
 	for ( i = 0 ; i < size ; i++ )
 	{
 		sum += points[i];	
 	}
-	*avg = (sum/size);
-	uint16_t max = (*avg)+5;
-	uint16_t min = (*avg)-5;
+	local_avg = (sum/size);
+	*avg = local_avg;
+	uint16_t max = (*avg)+3;
+	uint16_t min = (*avg)-3;
+	sum = 0;
 	for ( i = 1 ; i < size ; i++ )
 	{
 		//count steps
-		if ((points[i] <= min) && (points[i] >= max))
+		if ((points[i] <= min) && ((points[i-1] >= max) || (points[i-1] >= max)))
 		{
 			(*steps)++;
 		}
 		//figure out activity level (average varience)
-		if (points[i] >= *avg)
+		if (points[i] >= local_avg)
 		{
-			sum += (points[i] - (*avg));
+			sum += (points[i] - local_avg);
 		}
 		else
 		{
-			sum += ((*avg) - points[i]);
+			sum += (local_avg - points[i]);
 		}
 	}
 	
-	(*activity_level) = sum / size;	
+	*activity_level = (sum / size);	
 }
 
 

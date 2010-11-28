@@ -40,7 +40,7 @@ int main(void)
 
 	while(1)
 	{	
-		/*if ((ms_counter % 50) && (ms_counter >=1000) && (ms_counter <=9000))	//sample the Heart Rate signal every 50ms
+		/*if (((ms_counter % 50)== 0) && (ms_counter >=1000) && (ms_counter <=9000))	//sample the Heart Rate signal every 50ms
 		{
 			hr_sample[hr_index] = get_hr_sample();		
 			hr_index++; //increment index of array

@@ -111,7 +111,7 @@ int main(void)
 
 
 			char display_str[40];
-			sprintf( &display_str[0], "steps: %d  activity: %d", (int) step_count, (int) activity_level );
+			sprintf( &display_str[0], "steps:%d activity:%d avg:%d", (int) step_count, (int) activity_level, xavg );
 			drawstring( disp_buffer, 0, 2, &display_str[0] );
 			write_buffer(disp_buffer);
 
