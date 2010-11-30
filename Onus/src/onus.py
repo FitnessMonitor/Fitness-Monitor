@@ -426,14 +426,37 @@ class Onus:
 		#self.gladefile = "onus.glade"
 		self.gladefile = "../onus.glade"
 		self.wTree = gtk.glade.XML(self.gladefile, "mainWindow")
-		
+
+		FILES = [ "../../0_10_0.TXT" ]
+
+		t = 0
+		time = []
+		heart_rate = []
+		step_count = []
+		activity = []
+
+		# Get the Data
+		for file in FILES:
+			infile = open(file,"r")
+			data_section = 0
+			while 1:
+				line = infile.readline()
+				if not line:
+					break
+				moment = line.split(",")
+				time.append( t )
+				t += 1
+				step_count.append( moment[0] )
+				heart_rate.append( moment[1] )
+				activity.append( moment[2] )
+
 		self.figure = Figure(figsize=(6,4), dpi=72) 
 		self.axis = self.figure.add_subplot(111) 
 		self.axis.set_xlabel('Time (minutes)') 
 		self.axis.set_ylabel('Heart Rate (bpm)') 
 		self.axis.set_title('Activity') 
 		self.axis.grid(True)
-		self.axis.plot([1,2,3,4,5,6,7,8,9,10], [63,63,63,87,70,63,84,87,75,50])
+		self.axis.plot(time, heart_rate)
 		self.canvas = FigureCanvasGTK(self.figure) # a gtk.DrawingArea 
 		self.canvas.show() 
 		self.graphview = self.wTree.get_widget("vbox2") 
