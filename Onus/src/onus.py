@@ -456,7 +456,8 @@ class Onus:
 		self.axis.set_ylabel('Heart Rate (bpm)') 
 		self.axis.set_title('Activity') 
 		self.axis.grid(True)
-		self.axis.plot(time, heart_rate)
+		self.axis.plot(time, heart_rate, time, step_count, time, activity)
+		self.axis.legend(["Heart Rate", "Step Count", "Activity"])
 		self.canvas = FigureCanvasGTK(self.figure) # a gtk.DrawingArea 
 		self.canvas.show() 
 		self.graphview = self.wTree.get_widget("vbox2") 
