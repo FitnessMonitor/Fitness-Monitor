@@ -50,11 +50,11 @@ int main(void)
 	//used for calculating steps & activity
 	uint8_t accel_index = 0;
 	uint8_t xaxis [100];
-	uint16_t xavg;
-	uint16_t steps;
-	uint16_t step_count;
-	uint16_t activity_level;
-	uint16_t activity_sum;
+	uint16_t xavg = 0;
+	uint16_t steps = 0;
+	uint16_t step_count = 0;
+	uint16_t activity_level = 0;
+	uint16_t activity_sum = 0;
 
 
 	//arrays to store data between writes
@@ -67,6 +67,15 @@ int main(void)
 	char data_string[100];
 	unsigned int bytesWritten;
 
+
+	// Initialize AVR for use with nRF24L01
+	//nRF24L01_init();
+	// Wait for nRF24L01 to come up
+
+	// Configure nRF24L01
+	//nRF24L01_config();
+	//nRF24L01_powerdown();
+
 	///initialize
 	setup();
 	init_sdcard();
@@ -74,29 +83,16 @@ int main(void)
 
 	// initialize timer 2 to interrupt ever 1ms
 	timer2_1ms_setup();
+
 	while(1)
 	{	
 		if ((ms_counter % 50) == 0)	// sample every 50ms		
 		{	
 			//sample the Acceleromiter 
 			xaxis[accel_index++] = get_adc_sample(0);
-
-			// Dan Cole's test area
-			/*
-			unsigned int bytesWritten;
-			uint8_t sample;
-			char sample_text[4];
-			sample = get_adc_sample(0);
-			xaxis[accel_index++] = sample;
-			char *sdcard_text = &sample_text[0];
-			sprintf(sdcard_text, "%d    ", (int) sample );
-			f_write(&logFile, sdcard_text, 4, &bytesWritten);
-			f_write(&logFile, "\n", 1, &bytesWritten);
-			*/
 		}
 		if (ms_counter >= 1000) // every 1 seconds
 		{	
-			sdcard_close();
 			drawstring(disp_buffer, 0, 4, "SD Card Closed");
 			write_buffer(disp_buffer);
 
@@ -141,21 +137,21 @@ int main(void)
 				activity_sum = 0;
 				store_index++; //increment the index
 
- 				if ((minutes % 10) == 0) // every 10 minutes
+ 				if ((minutes % 1) == 0) // every 10 minutes
 				{	
 					store_index = 0;
 
 					//Write the data to the SD card 
-					sdcard_open(hours, minutes, seconds);
+					//sdcard_open(hours, minutes, seconds);
 					int k;
 					for (k = 0; k < 10; k++)
 					{			
 					//each minute gets its own line		
 					sprintf( &data_string[0], "%d,%d,%d,      ", (int) steps_delta[k], (int) heart_rate[k], (int) activity[k] );
-					f_write(&logFile, &data_string[0], 10, &bytesWritten);
-					f_write(&logFile, "\n", 1, & bytesWritten);
+					//f_write(&logFile, &data_string[0], 10, &bytesWritten);
+					//f_write(&logFile, "\n", 1, & bytesWritten);
 					}
-					sdcard_close();
+					//sdcard_close();
 				} //endif
 			} //endif	
 		} //endif

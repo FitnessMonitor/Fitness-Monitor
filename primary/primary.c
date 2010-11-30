@@ -136,7 +136,7 @@ void get_steps(uint8_t *points, uint8_t size, uint16_t * avg, uint16_t * steps, 
 	for ( i = 1 ; i < size ; i++ )
 	{
 		//count steps
-		if ((points[i] <= min) && ((points[i-1] >= max) || (points[i-1] >= max)))
+		if ((points[i] <= min) && (points[i-1] >= max))
 		{
 			(*steps)++;
 		}
