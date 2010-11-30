@@ -107,7 +107,7 @@ int main(void)
 
 
 			char display_str[40];
-			sprintf( &display_str[0], "steps:%d activity:%d avg:%d", (int) step_count, (int) activity_level, xavg );
+			sprintf( &display_str[0], "steps:%d activity:%d", (int) step_count, (int) activity_level );
 			drawstring( disp_buffer, 0, 2, &display_str[0] );
 			write_buffer(disp_buffer);
 
@@ -133,25 +133,25 @@ int main(void)
 				
 				//store the activity level;
 				
-				activity[store_index] = activity_sum / 10;
+				activity[store_index] = (activity_sum / 60);
 				activity_sum = 0;
 				store_index++; //increment the index
 
- 				if ((minutes % 1) == 0) // every 10 minutes
+ 				if ((minutes % 10) == 0) // every 10 minutes
 				{	
 					store_index = 0;
 
 					//Write the data to the SD card 
-					//sdcard_open(hours, minutes, seconds);
+					sdcard_open(hours, minutes, seconds);
 					int k;
 					for (k = 0; k < 10; k++)
 					{			
 					//each minute gets its own line		
 					sprintf( &data_string[0], "%d,%d,%d,      ", (int) steps_delta[k], (int) heart_rate[k], (int) activity[k] );
-					//f_write(&logFile, &data_string[0], 10, &bytesWritten);
-					//f_write(&logFile, "\n", 1, & bytesWritten);
+					f_write(&logFile, &data_string[0], 10, &bytesWritten);
+					f_write(&logFile, "\n", 1, & bytesWritten);
 					}
-					//sdcard_close();
+					sdcard_close();
 				} //endif
 			} //endif	
 		} //endif
