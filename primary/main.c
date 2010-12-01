@@ -99,7 +99,7 @@ int main(void)
 			ms_counter = 0; // reset counter
 			seconds ++;
 			accel_index = 0;
-			clear_buffer(&disp_buffer[0]);
+			//clear_buffer(&disp_buffer[0]);
 			disp_hms(hours, minutes, seconds);
 			get_steps(&xaxis[0], 20, &xavg, &steps, &activity_level);
 			step_count += steps;
