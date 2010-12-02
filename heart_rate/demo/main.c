@@ -35,9 +35,19 @@ int main(void)
 	{	
 		if ((ms_counter == 50))	//sample the Heart Rate signal every 50ms
 		{
-			if (get_hr_sample() >= 80) SET_BIT(PORTD,2);	
-			else CLEAR_BIT(PORTD,2);	
-			ms_counter = 0;
+			if (get_hr_sample() >= 90) 
+			{
+				SET_BIT(PORTD,2);
+				nRF24L01_data[0] = 2;
+			}	
+			else 
+			{
+				CLEAR_BIT(PORTD,2);
+				nRF24L01_data[0] = 1;
+			}	
+			ms_counter = 0;				
+			nRF24L01_send(buffer,1);
+
 		}
 		sleep_now();	// sleep until timer2 interrupt
 	}
